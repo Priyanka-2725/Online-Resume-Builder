@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Builder - Create Professional Resumes Online</title>
+    <link rel="stylesheet" href="home.css">
+    <meta name="description" content="Create stunning professional resumes with our easy-to-use online resume builder. Multiple templates, PDF export, and expert guidance.">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">
+                    <h2>Resume Builder</h2>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="#home" class="nav-link">Home</a></li>
+                    <li><a href="#features" class="nav-link">Features</a></li>
+                    <li><a href="#templates" class="nav-link">Templates</a></li>
+                    <li><a href="#about" class="nav-link">About</a></li>
+                    <li><a href="#" class="nav-link login-btn" onclick="showLoginModal()">Login</a></li>
+                    <li><a href="#" class="nav-link signup-btn" onclick="showSignupModal()">Sign Up</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1>Create Your Perfect Resume in Minutes</h1>
+                <p>Build a professional resume that gets you hired. Choose from expert-designed templates and create your resume in just a few clicks.</p>
+                <div class="hero-buttons">
+                    <button class="btn-primary" onclick="showSignupModal()">Get Started Free</button>
+                    <button class="btn-secondary" onclick="showLoginModal()">I Have an Account</button>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">100+</span>
+                        <span class="stat-text">Resumes Created</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">95%</span>
+                        <span class="stat-text">Success Rate</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">24/7</span>
+                        <span class="stat-text">Support</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="resume-preview-demo">
+                    <div class="demo-resume">
+                        <div class="demo-header">
+                            <div class="demo-name">John Doe</div>
+                            <div class="demo-contact">john@example.com • (555) 123-4567</div>
+                        </div>
+                        <div class="demo-section">
+                            <div class="demo-section-title">EXPERIENCE</div>
+                            <div class="demo-job">
+                                <div class="demo-job-title">Software Engineer</div>
+                                <div class="demo-company">Tech Company Inc.</div>
+                                <div class="demo-description">Developed scalable web applications...</div>
+                            </div>
+                        </div>
+                        <div class="demo-section">
+                            <div class="demo-section-title">SKILLS</div>
+                            <div class="demo-skills">
+                                <span class="demo-skill">JavaScript</span>
+                                <span class="demo-skill">React</span>
+                                <span class="demo-skill">Node.js</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">Why Choose Our Resume Builder?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📝</div>
+                    <h3>Easy to Use</h3>
+                    <p>Intuitive step-by-step process guides you through creating a professional resume in minutes.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Professional Templates</h3>
+                    <p>Choose from modern and classic templates designed by experts to make you stand out.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>Mobile Friendly</h3>
+                    <p>Create and edit your resume on any device - desktop, tablet, or smartphone.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💾</div>
+                    <h3>Save & Export</h3>
+                    <p>Save multiple resumes and export them as high-quality PDFs ready for job applications.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Real-time Preview</h3>
+                    <p>See your resume update in real-time as you fill out the form.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Secure & Private</h3>
+                    <p>Your data is encrypted and secure. We never share your information with third parties.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Templates Section -->
+    <section id="templates" class="templates">
+        <div class="container">
+            <h2 class="section-title">Choose Your Template</h2>
+            <div class="templates-grid">
+                <div class="template-card">
+                    <div class="template-preview">
+                        <div class="template-modern">
+                            <div class="template-header modern-header">
+                                <div class="template-name">Jane Smith</div>
+                                <div class="template-contact">jane@email.com • (555) 987-6543</div>
+                            </div>
+                            <div class="template-section">
+                                <div class="template-section-title modern-title">EXPERIENCE</div>
+                                <div class="template-content">Software Developer</div>
+                            </div>
+                        </div>
+                    </div>
+                    <h3>Modern Template</h3>
+                    <p>Clean and contemporary design with blue accents</p>
+                </div>
+                <div class="template-card">
+                    <div class="template-preview">
+                        <div class="template-classic">
+                            <div class="template-header classic-header">
+                                <div class="template-name">Jane Smith</div>
+                                <div class="template-contact">jane@email.com • (555) 987-6543</div>
+                            </div>
+                            <div class="template-section">
+                                <div class="template-section-title classic-title">EXPERIENCE</div>
+                                <div class="template-content">Software Developer</div>
+                            </div>
+                        </div>
+                    </div>
+                    <h3>Classic Template</h3>
+                    <p>Traditional serif font layout for conservative industries</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>About Resume Builder</h2>
+                    <p>We help job seekers create professional resumes that get results. Our platform combines ease of use with professional design to help you land your dream job.</p>
+                    <p>With thousands of successful resumes created, we understand what employers are looking for and help you showcase your skills and experience effectively.</p>
+                    <div class="about-features">
+                        <div class="about-feature">
+                            <span class="check-icon">✓</span>
+                            <span>ATS-friendly templates</span>
+                        </div>
+                        <div class="about-feature">
+                            <span class="check-icon">✓</span>
+                            <span>Expert-designed layouts</span>
+                        </div>
+                        <div class="about-feature">
+                            <span class="check-icon">✓</span>
+                            <span>No hidden fees</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image">
+                    <div class="stats-card">
+                        <h3>Success Stories</h3>
+                        <div class="success-stats">
+                            <div class="success-stat">
+                                <span class="success-number">89%</span>
+                                <span class="success-text">Get Interviews</span>
+                            </div>
+                            <div class="success-stat">
+                                <span class="success-number">76%</span>
+                                <span class="success-text">Get Job Offers</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <h2>Ready to Build Your Resume?</h2>
+            <p>Join thousands of successful job seekers who have used our platform</p>
+            <button class="btn-primary" onclick="showSignupModal()">Start Building Now</button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Resume Builder</h3>
+                    <p>Create professional resumes that get you hired.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#templates">Templates</a></li>
+                        <li><a href="#about">About</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Resume Builder. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideLoginModal()">&times;</span>
+            <h2>Login to Your Account</h2>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" name="password" required>
+                </div>
+                <button type="submit" class="btn-primary">Login</button>
+                <p class="modal-link">Don't have an account? <a href="#" onclick="showSignupModal()">Sign up here</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideSignupModal()">&times;</span>
+            <h2>Create Your Account</h2>
+            <form id="signupForm" onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                </div>
+                <button type="submit" class="btn-primary">Create Account</button>
+                <p class="modal-link">Already have an account? <a href="#" onclick="showLoginModal()">Login here</a></p>
+            </form>
+        </div>
+    </div>
+
+    <script src="landing.js"></script>
+</body>
+</html>

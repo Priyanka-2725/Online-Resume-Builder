@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Builder - Create Professional Resumes</title>
+    <link rel="stylesheet" href="styles.css">
+    <meta name="description" content="Create professional resumes with our easy-to-use resume builder. Multiple templates, PDF export, and step-by-step guidance.">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-nav">
+                <div class="nav-brand">
+                    <h1>Resume Builder</h1>
+                    <p>Create your professional resume in minutes</p>
+                </div>
+                <div class="nav-actions">
+                    <button class="back-btn" onclick="goToHome()">
+                        ← Back to Home
+                    </button>
+                    <div class="user-info" id="userInfo" style="display: none;">
+                        <span class="user-greeting" id="userGreeting"></span>
+                        <button class="logout-btn" onclick="logout()">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div id="progressBar" class="progress-fill"></div>
+            </div>
+            <div id="stepInfo" class="step-info">Step 1 of 5</div>
+        </div>
+
+        <!-- Error Container -->
+        <div id="errorContainer" class="error-container" style="display: none;"></div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Form Section -->
+            <div class="form-section">
+                <h2 id="stepTitle">Personal Information</h2>
+                
+                <!-- Step 0: Personal Information -->
+                <div id="step-0" class="step">
+                    <div class="form-group">
+                        <label for="title">Resume Title</label>
+                        <input type="text" id="title" name="title" placeholder="e.g., Software Engineer Resume">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="personal_fullName">Full Name *</label>
+                            <input type="text" id="personal_fullName" name="personal_fullName" placeholder="John Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="personal_email">Email *</label>
+                            <input type="email" id="personal_email" name="personal_email" placeholder="john@example.com" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="personal_phone">Phone *</label>
+                            <input type="tel" id="personal_phone" name="personal_phone" placeholder="+1 (555) 123-4567" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="personal_address">Address *</label>
+                            <input type="text" id="personal_address" name="personal_address" placeholder="123 Main St, City, State 12345" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="personal_linkedIn">LinkedIn (Optional)</label>
+                            <input type="url" id="personal_linkedIn" name="personal_linkedIn" placeholder="https://linkedin.com/in/johndoe">
+                        </div>
+                        <div class="form-group">
+                            <label for="personal_website">Website (Optional)</label>
+                            <input type="url" id="personal_website" name="personal_website" placeholder="https://johndoe.com">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="personal_summary">Professional Summary *</label>
+                        <textarea id="personal_summary" name="personal_summary" rows="4" placeholder="Brief summary of your professional background and goals..." required></textarea>
+                    </div>
+                </div>
+
+                <!-- Step 1: Education -->
+                <div id="step-1" class="step" style="display: none;">
+                    <div class="section-header">
+                        <h3>Education</h3>
+                        <button type="button" class="add-education btn-primary">+ Add Education</button>
+                    </div>
+                    <div id="educationContainer"></div>
+                </div>
+
+                <!-- Step 2: Experience -->
+                <div id="step-2" class="step" style="display: none;">
+                    <div class="section-header">
+                        <h3>Work Experience</h3>
+                        <button type="button" class="add-experience btn-primary">+ Add Experience</button>
+                    </div>
+                    <div id="experienceContainer"></div>
+                </div>
+
+                <!-- Step 3: Skills -->
+                <div id="step-3" class="step" style="display: none;">
+                    <div class="section-header">
+                        <h3>Skills</h3>
+                        <button type="button" class="add-skill btn-primary">+ Add Skill</button>
+                    </div>
+                    <div id="skillsContainer"></div>
+                </div>
+
+                <!-- Step 4: Template Selection & Preview -->
+                <div id="step-4" class="step" style="display: none;">
+                    <h3>Choose Template</h3>
+                    <div class="template-selection">
+                        <div class="template-option selected" data-template="modern">
+                            <div class="template-preview">
+                                <div class="template-preview-modern">
+                                    <div class="preview-header modern-header">
+                                        <div class="preview-name">John Doe</div>
+                                        <div class="preview-contact">john@example.com • (555) 123-4567</div>
+                                    </div>
+                                    <div class="preview-section">
+                                        <div class="preview-section-title modern-title">EXPERIENCE</div>
+                                        <div class="preview-content">
+                                            <div class="preview-job-title">Software Engineer</div>
+                                            <div class="preview-company modern-company">Tech Company</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="template-info">
+                                <h4>Modern</h4>
+                                <p>Clean design with blue accents</p>
+                            </div>
+                            <button type="button" class="template-select btn-primary" data-template="modern">Select</button>
+                        </div>
+                        
+                        <div class="template-option" data-template="classic">
+                            <div class="template-preview">
+                                <div class="template-preview-classic">
+                                    <div class="preview-header classic-header">
+                                        <div class="preview-name">John Doe</div>
+                                        <div class="preview-contact">john@example.com • (555) 123-4567</div>
+                                    </div>
+                                    <div class="preview-section">
+                                        <div class="preview-section-title classic-title">EXPERIENCE</div>
+                                        <div class="preview-content">
+                                            <div class="preview-job-title">Software Engineer, Tech Company</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="template-info">
+                                <h4>Classic</h4>
+                                <p>Traditional serif font layout</p>
+                            </div>
+                            <button type="button" class="template-select btn-primary" data-template="classic">Select</button>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button type="button" id="saveResume" class="btn-secondary">Save Resume</button>
+                        <button type="button" id="exportPDF" class="btn-primary">Download PDF</button>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="navigation">
+                    <button type="button" id="prevBtn" class="btn-secondary">Previous</button>
+                    <button type="button" id="nextBtn" class="btn-primary">Next</button>
+                </div>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="preview-section">
+                <h3>Preview</h3>
+                <div id="resumePreview" class="resume-preview">
+                    <div class="preview-placeholder">
+                        <p>Your resume preview will appear here as you fill out the form.</p>
+                    </div>
+                </div>
+                <div class="completion-meter">
+                    <h4>Completion</h4>
+                    <div class="completion-bar">
+                        <div id="completionFill" class="completion-fill" style="width: 0%"></div>
+                    </div>
+                    <span id="completionText">0% Complete</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2025 Resume Builder. Create professional resumes easily.</p>
+        </footer>
+    </div>
+    <div id="authCheck" class="auth-overlay" style="display: none;">
+        <div class="auth-message">
+            <h2>Please Login</h2>
+            <p>You need to be logged in to use the resume builder.</p>
+            <button class="btn-primary" onclick="redirectToLogin()">Go to Login</button>
+        </div>
+    </div>
+    
+    <script src="index.js"></script>
+</body>
+</html>
