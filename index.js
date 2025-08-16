@@ -1170,10 +1170,12 @@ class ResumeBuilder {
         }
         
         try {
+            const token = sessionStorage.getItem('authToken');
             const response = await fetch('api.php?endpoint=resumes', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
                 },
                 body: JSON.stringify(this.resumeData)
             });
@@ -1238,6 +1240,17 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Check login status and update UI
     checkLoginStatus();
+
+    // If URL asks for My Resumes view, show it
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const view = params.get('view');
+        if (view === 'my-resumes') {
+            showMyResumes();
+        }
+    } catch (e) {
+        console.error('Error parsing URL params', e);
+    }
 });
 
 // Function to go back to home page
@@ -1303,6 +1316,34 @@ function showResumeBuilder() {
     }
 }
 
+// Create a fresh resume and open the builder form
+function createNewResume() {
+    if (!window.resumeBuilder) return;
+    window.resumeBuilder.resumeData = {
+        id: null,
+        title: '',
+        personalInfo: {
+            fullName: '',
+            email: '',
+            phone: '',
+            address: '',
+            linkedIn: '',
+            website: '',
+            summary: ''
+        },
+        education: [],
+        experience: [],
+        skills: [],
+        template: 'modern'
+    };
+    window.resumeBuilder.populateForm();
+    window.resumeBuilder.updatePreview();
+    showResumeBuilder();
+    window.resumeBuilder.currentStep = 0;
+    window.resumeBuilder.showCurrentStep();
+    window.resumeBuilder.updateProgressBar();
+}
+
 // Function to load and display saved resumes
 async function loadSavedResumes() {
     try {
@@ -1335,6 +1376,7 @@ async function loadSavedResumes() {
 // Function to display resumes in the grid
 function displayResumes(resumes) {
     const resumesGrid = document.getElementById('resumesGrid');
+    const resumesCount = document.getElementById('resumesCount');
     
     if (!resumesGrid) return;
     
@@ -1346,9 +1388,11 @@ function displayResumes(resumes) {
                 <button class="btn-primary" onclick="showResumeBuilder()">Create Resume</button>
             </div>
         `;
+        if (resumesCount) resumesCount.textContent = '(0)';
         return;
     }
     
+    if (resumesCount) resumesCount.textContent = `(${resumes.length})`;
     resumesGrid.innerHTML = resumes.map(resume => `
         <div class="resume-card" onclick="editResume('${resume.id}')">
             <h3>${resume.title || 'Untitled Resume'}</h3>
@@ -1375,7 +1419,12 @@ function displayResumes(resumes) {
 // Function to edit a resume
 async function editResume(resumeId) {
     try {
-        const response = await fetch(`api.php?endpoint=resumes&id=${resumeId}`);
+        const token = sessionStorage.getItem('authToken');
+        const response = await fetch(`api.php?endpoint=resumes&id=${resumeId}`, {
+            headers: {
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+            }
+        });
         const result = await response.json();
         
         if (result.success && result.data.length > 0) {
@@ -1410,31 +1459,33 @@ async function editResume(resumeId) {
 
 // Function to download a resume
 async function downloadResume(resumeId) {
+    console.log('Starting download for resume:', resumeId);
     try {
-        const response = await fetch(`api.php?endpoint=resumes&id=${resumeId}`);
-        const result = await response.json();
-        
-        if (result.success && result.data.length > 0) {
-            const resume = result.data[0];
-            
-            // Temporarily load resume data and export
-            const originalData = { ...window.resumeBuilder.resumeData };
-            window.resumeBuilder.resumeData = {
-                id: resume.id,
-                title: resume.title,
-                personalInfo: resume.personal_info,
-                education: resume.education || [],
-                experience: resume.experience || [],
-                skills: resume.skills || [],
-                template: resume.template || 'modern'
-            };
-            
-            // Export PDF
-            window.resumeBuilder.exportToPDF();
-            
-            // Restore original data
-            window.resumeBuilder.resumeData = originalData;
+        const token = sessionStorage.getItem('authToken');
+        console.log('Auth token:', token ? 'Present' : 'Missing');
+        const response = await fetch(`api.php?endpoint=download&id=${resumeId}`, {
+            headers: {
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+            }
+        });
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        if (!response.ok) {
+            const maybeJson = await response.json().catch(() => null);
+            console.log('Error response:', maybeJson);
+            throw new Error(maybeJson?.error || `Download failed (${response.status})`);
         }
+        const blob = await response.blob();
+        console.log('Blob size:', blob.size);
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'resume.pdf';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+        console.log('Download completed');
     } catch (error) {
         console.error('Error downloading resume:', error);
         alert('Error downloading resume. Please try again.');
@@ -1448,10 +1499,12 @@ async function deleteResume(resumeId) {
     }
     
     try {
+        const token = sessionStorage.getItem('authToken');
         const response = await fetch('api.php?endpoint=resumes', {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {})
             },
             body: JSON.stringify({ id: resumeId })
         });
