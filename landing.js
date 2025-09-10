@@ -33,6 +33,25 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // Theme initialization
+    try {
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+        setTheme(theme);
+        const toggleBtn = document.getElementById('themeToggle');
+        if (toggleBtn) {
+            toggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+            toggleBtn.addEventListener('click', () => {
+                const current = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+                const next = current === 'dark' ? 'light' : 'dark';
+                setTheme(next);
+                localStorage.setItem('theme', next);
+                toggleBtn.textContent = next === 'dark' ? '☀️' : '🌙';
+            });
+        }
+    } catch (e) { console.warn('Theme init failed', e); }
+
     // Check if user is already logged in
     checkLoginStatus();
     
@@ -46,6 +65,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+function setTheme(mode) {
+    if (mode === 'dark') {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+}
 
 // Modal functions
 function showLoginModal() {

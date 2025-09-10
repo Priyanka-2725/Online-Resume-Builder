@@ -16,6 +16,20 @@ body {
     overflow-x: hidden;
 }
 
+/* Theme Toggle Button */
+.theme-toggle {
+    background: transparent;
+    border: 2px solid #e2e8f0;
+    color: #111827;
+    padding: 8px 12px;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.theme-toggle:hover {
+    background: #f3f4f6;
+}
+
 /* Header & Navigation */
 .header {
     position: fixed;
@@ -41,7 +55,7 @@ body {
 }
 
 .logo h2 {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0a1f44 0%, #2563eb 50%, #93c5fd 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -66,7 +80,7 @@ body {
 }
 
 .nav-link:hover {
-    color: #667eea;
+    color: #2563eb;
 }
 
 .login-btn {
@@ -75,7 +89,7 @@ body {
 }
 
 .signup-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0a1f44 0%, #2563eb 50%, #93c5fd 100%);
     color: white !important;
 }
 
@@ -100,7 +114,7 @@ body {
 
 /* Hero Section */
 .hero {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0a1f44 0%, #2563eb 50%, #93c5fd 100%);
     color: white;
     padding: 120px 0 80px 0;
     min-height: 100vh;
@@ -226,7 +240,7 @@ body {
 }
 
 .demo-header {
-    border-bottom: 3px solid #667eea;
+    border-bottom: 3px solid #2563eb;
     padding-bottom: 1rem;
     margin-bottom: 1.5rem;
 }
@@ -309,6 +323,55 @@ body {
     padding: 100px 0;
     background: #f8fafc;
 }
+
+/* Dark Mode */
+.dark body {
+    color: #e5e7eb;
+    background: #0b1220;
+}
+.dark .header {
+    background: rgba(17, 24, 39, 0.85);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.dark .nav-link { color: #e5e7eb; }
+.dark .nav-link:hover { color: #93c5fd; }
+.dark .bar { background: #e5e7eb; }
+.dark .hero {
+    background: linear-gradient(135deg, #0a1f44 0%, #111827 50%, #0b1220 100%);
+}
+.dark .btn-primary {
+    background: #111827;
+    color: #e5e7eb;
+}
+.dark .btn-secondary {
+    color: #e5e7eb;
+    border-color: #374151;
+}
+.dark .resume-preview-demo { box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+.dark .demo-header { border-bottom-color: #60a5fa; }
+.dark .features { background: #0f172a; }
+.dark .feature-card { background: #0b1220; border-color: #1f2a44; }
+.dark .feature-card h3 { color: #f3f4f6; }
+.dark .feature-card p { color: #cbd5e1; }
+.dark .templates { background: #0b1220; }
+.dark .template-preview { background: #0f172a; border-color: #1f2a44; }
+.dark .template-modern, .dark .template-classic { background: #0b1220; box-shadow: none; }
+.dark .modern-header { border-bottom-color: #60a5fa; }
+.dark .classic-header { border-bottom-color: #475569; }
+.dark .template-name, .dark .template-card h3 { color: #e5e7eb; }
+.dark .template-contact, .dark .template-card p { color: #94a3b8; }
+.dark .about { background: #0f172a; }
+.dark .about-text h2 { color: #e5e7eb; }
+.dark .about-text p { color: #cbd5e1; }
+.dark .stats-card { background: #0b1220; color: #e5e7eb; }
+.dark .success-text { color: #cbd5e1; }
+.dark .cta { background: linear-gradient(135deg, #0a1f44 0%, #111827 50%, #0b1220 100%); }
+.dark .footer { background: #0b1220; }
+.dark .footer-section p, .dark .footer-section ul li a, .dark .footer-bottom { color: #94a3b8; }
+.dark .modal-content { background: #0b1220; color: #e5e7eb; }
+.dark .form-group input { background: #0f172a; color: #e5e7eb; border-color: #1f2a44; }
+.dark .form-group input:focus { border-color: #60a5fa; box-shadow: 0 0 0 3px rgba(96,165,250,0.15); }
+.dark .modal .btn-primary { background: linear-gradient(135deg, #0a1f44 0%, #1d4ed8 50%, #60a5fa 100%); }
 
 .features-grid {
     display: grid;
@@ -537,7 +600,7 @@ body {
     display: block;
     font-size: 2.5rem;
     font-weight: 700;
-    color: #667eea;
+    color: #60a5fa;
     margin-bottom: 0.5rem;
 }
 
@@ -550,7 +613,7 @@ body {
 
 /* CTA Section */
 .cta {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0a1f44 0%, #2563eb 50%, #93c5fd 100%);
     color: white;
     padding: 80px 0;
     text-align: center;
@@ -590,7 +653,7 @@ body {
 
 .footer-section h3 {
     font-size: 1.5rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0a1f44 0%, #2563eb 50%, #93c5fd 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -711,7 +774,7 @@ body {
 
 .modal .btn-primary {
     width: 100%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0a1f44 0%, #2563eb 50%, #93c5fd 100%);
     color: white;
     margin-bottom: 1rem;
 }
@@ -859,7 +922,7 @@ body {
     width: 20px;
     height: 20px;
     margin: -10px 0 0 -10px;
-    border: 2px solid #667eea;
+    border: 2px solid #2563eb;
     border-radius: 50%;
     border-top-color: transparent;
     animation: spin 1s linear infinite;
