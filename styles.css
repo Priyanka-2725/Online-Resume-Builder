@@ -22,7 +22,7 @@ body {
 .header {
     margin-bottom: 30px;
     padding: 30px 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0a1f44 0%, #2563eb 50%, #93c5fd 100%);
     color: white;
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -137,7 +137,7 @@ body {
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #667eea, #764ba2);
+    background: linear-gradient(90deg, #0a1f44, #2563eb, #93c5fd);
     border-radius: 4px;
     transition: width 0.3s ease;
     width: 20%;
@@ -261,7 +261,7 @@ body {
 
 /* Buttons */
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0a1f44 0%, #2563eb 50%, #93c5fd 100%);
     color: white;
     border: none;
     padding: 12px 24px;
@@ -746,7 +746,7 @@ body {
 
 .completion-fill {
     height: 100%;
-    background: linear-gradient(90deg, #10b981, #059669);
+    background: linear-gradient(90deg, #0a1f44, #2563eb, #93c5fd);
     border-radius: 4px;
     transition: width 0.3s ease;
 }
@@ -1090,7 +1090,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0a1f44 0%, #2563eb 50%, #93c5fd 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1139,7 +1139,7 @@ body {
 }
 
 .completion-actions .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0a1f44 0%, #2563eb 50%, #93c5fd 100%);
     color: white;
 }
 
