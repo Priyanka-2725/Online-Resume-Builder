@@ -873,6 +873,41 @@ body {
 .dark .resume-card .resume-meta { color: #ffffff; }
 .dark .footer { border-top-color: #1f2a44; color: #94a3b8; }
 
+/* Dark surfaces for dynamic builder sections */
+.dark .education-item,
+.dark .experience-item,
+.dark .project-item,
+.dark .achievement-item {
+    background: #0f172a;
+    border-color: #1f2a44;
+}
+.dark .education-item h4,
+.dark .experience-item h4,
+.dark .project-item label,
+.dark .achievement-item label {
+    color: #ffffff;
+}
+
+/* Dark mode for template selection/preview tiles */
+.dark .template-option {
+    background: #0b1220;
+    border-color: #1f2a44;
+}
+.dark .template-option.selected {
+    border-color: #60a5fa;
+    background: #0b1220;
+}
+.dark .template-preview {
+    background: #0f172a;
+    border-color: #1f2a44;
+}
+.dark .template-preview-modern,
+.dark .template-preview-classic {
+    color: #ffffff;
+}
+.dark .modern-title,
+.dark .classic-title { color: #ffffff; border-bottom-color: #334155; }
+
 .resume-card h3 {
     font-size: 1.2rem;
     font-weight: 600;
