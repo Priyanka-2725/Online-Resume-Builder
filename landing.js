@@ -48,6 +48,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 setTheme(next);
                 localStorage.setItem('theme', next);
                 toggleBtn.textContent = next === 'dark' ? '☀️' : '🌙';
+                // Recompute header background after theme change
+                try { (typeof updateHeaderBg === 'function') && updateHeaderBg(); } catch {}
             });
         }
     } catch (e) { console.warn('Theme init failed', e); }
@@ -55,15 +57,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check if user is already logged in
     checkLoginStatus();
     
-    // Add scroll effect to navbar
-    window.addEventListener('scroll', function() {
+    // Add scroll effect to navbar with theme awareness
+    function updateHeaderBg() {
         const header = document.querySelector('.header');
-        if (window.scrollY > 100) {
-            header.style.background = 'rgba(255, 255, 255, 0.98)';
+        if (!header) return;
+        const isDark = document.documentElement.classList.contains('dark');
+        const scrolled = window.scrollY > 100;
+        if (isDark) {
+            header.style.background = scrolled ? 'rgba(17, 24, 39, 0.95)' : 'rgba(17, 24, 39, 0.85)';
         } else {
-            header.style.background = 'rgba(255, 255, 255, 0.95)';
+            header.style.background = scrolled ? 'rgba(255, 255, 255, 0.98)' : 'rgba(255, 255, 255, 0.95)';
         }
-    });
+    }
+    window.addEventListener('scroll', updateHeaderBg);
+    // Initial set on load
+    updateHeaderBg();
 });
 
 function setTheme(mode) {
