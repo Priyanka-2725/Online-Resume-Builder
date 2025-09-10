@@ -45,8 +45,8 @@
         <!-- My Resumes Section -->
         <div class="my-resumes-section" id="myResumesSection" style="display: none;">
             <div class="section-header">
-                <h2>My Saved Resumes</h2>
-                <button class="btn-primary" onclick="showResumeBuilder()">+ Create New Resume</button>
+                <h2>My Saved Resumes <span id="resumesCount" class="resumes-count" style="font-size: 0.8em; color: #6b7280; margin-left: 8px;"></span></h2>
+                <button class="btn-primary" onclick="createNewResume()">+ Create New Resume</button>
             </div>
             <div class="resumes-grid" id="resumesGrid">
                 <!-- Saved resumes will be displayed here -->
@@ -132,8 +132,17 @@
                     <div id="skillsContainer"></div>
                 </div>
 
-                <!-- Step 4: Template Selection & Preview -->
+                <!-- Step 4: Projects -->
                 <div id="step-4" class="step" style="display: none;">
+                    <div class="section-header">
+                        <h3>Projects</h3>
+                        <button type="button" class="add-project btn-primary">+ Add Project</button>
+                    </div>
+                    <div id="projectsContainer"></div>
+                </div>
+
+                <!-- Step 5: Template Selection & Preview -->
+                <div id="step-5" class="step" style="display: none;">
                     <h3>Choose Template</h3>
                     <div class="template-selection">
                         <div class="template-option selected" data-template="modern">
@@ -183,7 +192,7 @@
                     </div>
                     
                     <div class="action-buttons">
-                        <button type="button" id="exportPDF" class="btn-primary">Download PDF</button>
+                        <button type="button" id="exportPDF" class="btn-primary">🖨️ Print Resume</button>
                     </div>
                 </div>
 

@@ -2,7 +2,7 @@
 class ResumeBuilder {
     constructor() {
         this.currentStep = 0;
-        this.totalSteps = 5;
+        this.totalSteps = 6;
         this.resumeData = {
             title: '',
             personalInfo: {
@@ -17,6 +17,7 @@ class ResumeBuilder {
             education: [],
             experience: [],
             skills: [],
+            projects: [],
             template: 'modern'
         };
         this.init();
@@ -51,6 +52,10 @@ class ResumeBuilder {
                 this.addSkill();
             } else if (e.target.classList.contains('remove-skill')) {
                 this.removeSkill(e.target.dataset.index);
+            } else if (e.target.classList.contains('add-project')) {
+                this.addProject();
+            } else if (e.target.classList.contains('remove-project')) {
+                this.removeProject(e.target.dataset.index);
             }
         });
 
@@ -101,6 +106,21 @@ class ResumeBuilder {
             if (this.resumeData.skills[index] !== undefined) {
                 this.resumeData.skills[index] = value;
             }
+        } else if (name.startsWith('project_')) {
+            const [, index, field] = name.split('_');
+            if (this.resumeData.projects[index]) {
+                if (field === 'current' && type === 'checkbox') {
+                    this.resumeData.projects[index][field] = checked;
+                    // Disable end date if current project
+                    const endDateInput = document.querySelector(`input[name="project_${index}_endDate"]`);
+                    if (endDateInput) {
+                        endDateInput.disabled = checked;
+                        if (checked) endDateInput.value = '';
+                    }
+                } else {
+                    this.resumeData.projects[index][field] = value;
+                }
+            }
         }
         
         this.updatePreview();
@@ -141,7 +161,7 @@ class ResumeBuilder {
                         💾 Save My Resume
                     </button>
                     <button class="btn-secondary" onclick="resumeBuilder.exportToPDF()">
-                        📄 Download PDF
+                        🖨️ Print Resume
                     </button>
                     <button class="btn-secondary" onclick="resumeBuilder.showMyResumesFromCompletion()">
                         📋 View My Resumes
@@ -189,6 +209,7 @@ class ResumeBuilder {
             education: [],
             experience: [],
             skills: [],
+            projects: [],
             template: 'modern'
         };
         
@@ -216,6 +237,7 @@ class ResumeBuilder {
         this.addEducation();
         this.addExperience();
         this.addSkill();
+        this.addProject();
         
         this.updatePreview();
         this.updateCompletionMeter();
@@ -238,7 +260,7 @@ class ResumeBuilder {
         document.getElementById('nextBtn').textContent = this.currentStep === this.totalSteps - 1 ? 'Finish' : 'Next';
         
         // Update step title
-        const stepTitles = ['Personal Information', 'Education', 'Work Experience', 'Skills', 'Template & Preview'];
+        const stepTitles = ['Personal Information', 'Education', 'Work Experience', 'Skills', 'Projects', 'Template & Preview'];
         document.getElementById('stepTitle').textContent = stepTitles[this.currentStep];
     }
 
@@ -279,6 +301,13 @@ class ResumeBuilder {
             case 3: // Skills
                 const validSkills = this.resumeData.skills.filter(skill => skill.trim());
                 if (validSkills.length === 0) errors.push('At least one skill is required');
+                break;
+            case 4: // Projects
+                // Projects are optional, but if added, must be complete
+                this.resumeData.projects.forEach((project, index) => {
+                    if (!project.name.trim()) errors.push(`Project ${index + 1}: Project name is required`);
+                    if (!project.description.trim()) errors.push(`Project ${index + 1}: Description is required`);
+                });
                 break;
         }
         
@@ -451,6 +480,71 @@ class ResumeBuilder {
         `).join('');
     }
 
+    // Projects Management
+    addProject() {
+        const project = {
+            id: this.generateId(),
+            name: '',
+            description: '',
+            technologies: '',
+            url: '',
+            startDate: '',
+            endDate: '',
+            current: false
+        };
+        this.resumeData.projects.push(project);
+        this.renderProjectsForm();
+    }
+
+    removeProject(index) {
+        this.resumeData.projects.splice(index, 1);
+        this.renderProjectsForm();
+        this.updatePreview();
+    }
+
+    renderProjectsForm() {
+        const container = document.getElementById('projectsContainer');
+        container.innerHTML = this.resumeData.projects.map((project, index) => `
+            <div class="project-item">
+                <div class="form-group">
+                    <label>Project Name *</label>
+                    <input type="text" name="project_${index}_name" value="${project.name}" placeholder="e.g., E-commerce Website">
+                </div>
+                <div class="form-group">
+                    <label>Description *</label>
+                    <textarea name="project_${index}_description" placeholder="Describe what the project does and your role...">${project.description}</textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Technologies Used</label>
+                        <input type="text" name="project_${index}_technologies" value="${project.technologies}" placeholder="e.g., React, Node.js, MongoDB">
+                    </div>
+                    <div class="form-group">
+                        <label>Project URL (Optional)</label>
+                        <input type="url" name="project_${index}_url" value="${project.url}" placeholder="https://github.com/username/project">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Start Date</label>
+                        <input type="month" name="project_${index}_startDate" value="${project.startDate}">
+                    </div>
+                    <div class="form-group">
+                        <label>End Date</label>
+                        <input type="month" name="project_${index}_endDate" value="${project.endDate}" ${project.current ? 'disabled' : ''}>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="project_${index}_current" ${project.current ? 'checked' : ''}>
+                        Currently working on this project
+                    </label>
+                </div>
+                <button type="button" class="remove-project btn-secondary" data-index="${index}">Remove</button>
+            </div>
+        `).join('');
+    }
+
     // Template Selection
     selectTemplate(template) {
         this.resumeData.template = template;
@@ -532,6 +626,23 @@ class ResumeBuilder {
                     </div>
                 ` : ''}
 
+                ${this.resumeData.projects.length > 0 ? `
+                    <div class="resume-section">
+                        <h2>Projects</h2>
+                        ${this.resumeData.projects.map(project => `
+                            <div class="project-entry">
+                                <div class="entry-header">
+                                    <h3>${project.name || 'Project Name'}</h3>
+                                    <span class="date">${formatDate(project.startDate)} - ${project.current ? 'Present' : formatDate(project.endDate)}</span>
+                                </div>
+                                ${project.technologies ? `<p class="technologies">Technologies: ${project.technologies}</p>` : ''}
+                                ${project.url ? `<p class="project-url"><a href="${project.url}" target="_blank">View Project</a></p>` : ''}
+                                <p class="description">${project.description}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+
                 ${this.resumeData.skills.filter(skill => skill.trim()).length > 0 ? `
                     <div class="resume-section">
                         <h2>Skills</h2>
@@ -603,6 +714,23 @@ class ResumeBuilder {
                     </div>
                 ` : ''}
 
+                ${this.resumeData.projects.length > 0 ? `
+                    <div class="resume-section">
+                        <h2>PROJECTS</h2>
+                        ${this.resumeData.projects.map(project => `
+                            <div class="project-entry">
+                                <div class="entry-header">
+                                    <h3>${project.name || 'Project Name'}</h3>
+                                    <span class="date">${formatDate(project.startDate)} - ${project.current ? 'Present' : formatDate(project.endDate)}</span>
+                                </div>
+                                ${project.technologies ? `<p class="technologies">Technologies: ${project.technologies}</p>` : ''}
+                                ${project.url ? `<p class="project-url"><a href="${project.url}" target="_blank">View Project</a></p>` : ''}
+                                <p class="description">${project.description}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+
                 ${this.resumeData.skills.filter(skill => skill.trim()).length > 0 ? `
                     <div class="resume-section">
                         <h2>SKILLS</h2>
@@ -615,8 +743,23 @@ class ResumeBuilder {
 
     // PDF Export
     exportToPDF() {
-        // jsPDF is now loaded directly in HTML, so we can generate PDF immediately
-        this.createPDF();
+        // Open print page instead of direct PDF download
+        this.openPrintPage();
+    }
+
+    // Open print page
+    openPrintPage() {
+        const printWindow = window.open('', '_blank');
+        const printContent = this.generatePDFHTML();
+        
+        printWindow.document.write(printContent);
+        printWindow.document.close();
+        
+        // Wait for content to load, then trigger print dialog
+        printWindow.onload = function() {
+            printWindow.focus();
+            printWindow.print();
+        };
     }
 
     createPDF() {
@@ -1060,6 +1203,7 @@ class ResumeBuilder {
                     education: result.data[0].education || [],
                     experience: result.data[0].experience || [],
                     skills: result.data[0].skills || [],
+                    projects: result.data[0].projects || [],
                     template: result.data[0].template || 'modern'
                 };
                 this.populateForm();
@@ -1087,6 +1231,7 @@ class ResumeBuilder {
         this.renderEducationForm();
         this.renderExperienceForm();
         this.renderSkillsForm();
+        this.renderProjectsForm();
         
         // Template selection
         if (this.resumeData.template) {
@@ -1115,11 +1260,14 @@ class ResumeBuilder {
         if (this.resumeData.personalInfo.address.trim()) score += 8;
         if (this.resumeData.personalInfo.summary.trim()) score += 8;
 
-        // Experience (30%)
-        if (this.resumeData.experience.length > 0) score += 30;
+        // Experience (25%)
+        if (this.resumeData.experience.length > 0) score += 25;
 
         // Education (20%)
         if (this.resumeData.education.length > 0) score += 20;
+
+        // Projects (15%)
+        if (this.resumeData.projects.length > 0) score += 15;
 
         // Skills (10%)
         if (this.resumeData.skills.filter(skill => skill.trim()).length > 0) score += 10;
@@ -1170,10 +1318,12 @@ class ResumeBuilder {
         }
         
         try {
+            const token = sessionStorage.getItem('authToken');
             const response = await fetch('api.php?endpoint=resumes', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
                 },
                 body: JSON.stringify(this.resumeData)
             });
@@ -1235,9 +1385,23 @@ document.addEventListener('DOMContentLoaded', function() {
     if (window.resumeBuilder.resumeData.skills.length === 0) {
         window.resumeBuilder.addSkill();
     }
+    if (window.resumeBuilder.resumeData.projects.length === 0) {
+        window.resumeBuilder.addProject();
+    }
     
     // Check login status and update UI
     checkLoginStatus();
+
+    // If URL asks for My Resumes view, show it
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const view = params.get('view');
+        if (view === 'my-resumes') {
+            showMyResumes();
+        }
+    } catch (e) {
+        console.error('Error parsing URL params', e);
+    }
 });
 
 // Function to go back to home page
@@ -1303,6 +1467,35 @@ function showResumeBuilder() {
     }
 }
 
+// Create a fresh resume and open the builder form
+function createNewResume() {
+    if (!window.resumeBuilder) return;
+    window.resumeBuilder.resumeData = {
+        id: null,
+        title: '',
+        personalInfo: {
+            fullName: '',
+            email: '',
+            phone: '',
+            address: '',
+            linkedIn: '',
+            website: '',
+            summary: ''
+        },
+        education: [],
+        experience: [],
+        skills: [],
+        projects: [],
+        template: 'modern'
+    };
+    window.resumeBuilder.populateForm();
+    window.resumeBuilder.updatePreview();
+    showResumeBuilder();
+    window.resumeBuilder.currentStep = 0;
+    window.resumeBuilder.showCurrentStep();
+    window.resumeBuilder.updateProgressBar();
+}
+
 // Function to load and display saved resumes
 async function loadSavedResumes() {
     try {
@@ -1335,6 +1528,7 @@ async function loadSavedResumes() {
 // Function to display resumes in the grid
 function displayResumes(resumes) {
     const resumesGrid = document.getElementById('resumesGrid');
+    const resumesCount = document.getElementById('resumesCount');
     
     if (!resumesGrid) return;
     
@@ -1346,9 +1540,11 @@ function displayResumes(resumes) {
                 <button class="btn-primary" onclick="showResumeBuilder()">Create Resume</button>
             </div>
         `;
+        if (resumesCount) resumesCount.textContent = '(0)';
         return;
     }
     
+    if (resumesCount) resumesCount.textContent = `(${resumes.length})`;
     resumesGrid.innerHTML = resumes.map(resume => `
         <div class="resume-card" onclick="editResume('${resume.id}')">
             <h3>${resume.title || 'Untitled Resume'}</h3>
@@ -1361,8 +1557,8 @@ function displayResumes(resumes) {
                 <button class="btn-small btn-edit" onclick="event.stopPropagation(); editResume('${resume.id}')">
                     Edit
                 </button>
-                <button class="btn-small btn-download" onclick="event.stopPropagation(); downloadResume('${resume.id}')">
-                    Download
+                <button class="btn-small btn-download" onclick="event.stopPropagation(); printResume('${resume.id}')">
+                    Print
                 </button>
                 <button class="btn-small btn-delete" onclick="event.stopPropagation(); deleteResume('${resume.id}')">
                     Delete
@@ -1375,8 +1571,19 @@ function displayResumes(resumes) {
 // Function to edit a resume
 async function editResume(resumeId) {
     try {
-        const response = await fetch(`api.php?endpoint=resumes&id=${resumeId}`);
+        console.log('Starting edit for resume ID:', resumeId);
+        const token = sessionStorage.getItem('authToken');
+        console.log('Auth token:', token ? 'Present' : 'Missing');
+        
+        const response = await fetch(`api.php?endpoint=resumes&id=${resumeId}`, {
+            headers: {
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+            }
+        });
+        
+        console.log('Response status:', response.status);
         const result = await response.json();
+        console.log('API response:', result);
         
         if (result.success && result.data.length > 0) {
             const resume = result.data[0];
@@ -1389,6 +1596,7 @@ async function editResume(resumeId) {
                 education: resume.education || [],
                 experience: resume.experience || [],
                 skills: resume.skills || [],
+                projects: resume.projects || [],
                 template: resume.template || 'modern'
             };
             
@@ -1408,37 +1616,251 @@ async function editResume(resumeId) {
     }
 }
 
-// Function to download a resume
-async function downloadResume(resumeId) {
+// Function to print a resume
+async function printResume(resumeId) {
+    console.log('Starting print for resume:', resumeId);
     try {
-        const response = await fetch(`api.php?endpoint=resumes&id=${resumeId}`);
+        const token = sessionStorage.getItem('authToken');
+        const response = await fetch(`api.php?endpoint=resumes&id=${resumeId}`, {
+            headers: {
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+            }
+        });
         const result = await response.json();
         
         if (result.success && result.data.length > 0) {
             const resume = result.data[0];
             
-            // Temporarily load resume data and export
-            const originalData = { ...window.resumeBuilder.resumeData };
-            window.resumeBuilder.resumeData = {
-                id: resume.id,
-                title: resume.title,
-                personalInfo: resume.personal_info,
-                education: resume.education || [],
-                experience: resume.experience || [],
-                skills: resume.skills || [],
-                template: resume.template || 'modern'
+            // Create a temporary resume builder instance with the loaded data
+            const tempBuilder = {
+                resumeData: {
+                    personalInfo: resume.personal_info,
+                    education: resume.education || [],
+                    experience: resume.experience || [],
+                    skills: resume.skills || [],
+                    template: resume.template || 'modern'
+                },
+                generatePDFHTML: function() {
+                    const formatDate = (dateString) => {
+                        if (!dateString) return '';
+                        const date = new Date(dateString + '-01');
+                        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+                    };
+
+                    return `
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta charset="utf-8">
+                            <title>${this.resumeData.personalInfo.fullName || 'Resume'} - Resume</title>
+                            <style>
+                                @media print {
+                                    body { margin: 0; }
+                                    @page { margin: 0.5in; }
+                                }
+                                body {
+                                    margin: 0;
+                                    padding: 20px;
+                                    background: white;
+                                    font-family: Arial, sans-serif;
+                                    line-height: 1.6;
+                                    color: #333;
+                                }
+                                .resume-container {
+                                    max-width: 800px;
+                                    margin: 0 auto;
+                                }
+                                .header {
+                                    border-bottom: 3px solid #2563eb;
+                                    padding-bottom: 15px;
+                                    margin-bottom: 20px;
+                                }
+                                .name {
+                                    font-size: 32px;
+                                    font-weight: bold;
+                                    color: #1f2937;
+                                    margin-bottom: 10px;
+                                }
+                                .contact-info {
+                                    color: #6b7280;
+                                    font-size: 14px;
+                                    line-height: 1.4;
+                                }
+                                .section {
+                                    margin-bottom: 25px;
+                                }
+                                .section-title {
+                                    font-size: 18px;
+                                    font-weight: bold;
+                                    color: #1f2937;
+                                    margin-bottom: 15px;
+                                    border-bottom: 1px solid #d1d5db;
+                                    padding-bottom: 5px;
+                                }
+                                .entry {
+                                    margin-bottom: 15px;
+                                }
+                                .entry-header {
+                                    display: flex;
+                                    justify-content: space-between;
+                                    align-items: flex-start;
+                                    margin-bottom: 5px;
+                                }
+                                .entry-title {
+                                    font-size: 16px;
+                                    font-weight: 600;
+                                    color: #1f2937;
+                                    margin: 0;
+                                }
+                                .entry-date {
+                                    color: #6b7280;
+                                    font-size: 12px;
+                                    white-space: nowrap;
+                                }
+                                .entry-subtitle {
+                                    color: #2563eb;
+                                    font-weight: 500;
+                                    margin: 0 0 8px 0;
+                                    font-size: 14px;
+                                }
+                                .entry-description {
+                                    color: #374151;
+                                    line-height: 1.6;
+                                    white-space: pre-line;
+                                    margin: 0;
+                                    font-size: 14px;
+                                }
+                                .skills-list {
+                                    display: flex;
+                                    flex-wrap: wrap;
+                                    gap: 8px;
+                                }
+                                .skill-tag {
+                                    background-color: #dbeafe;
+                                    color: #1e40af;
+                                    padding: 4px 12px;
+                                    border-radius: 20px;
+                                    font-size: 12px;
+                                    font-weight: 500;
+                                }
+                                @media print {
+                                    .resume-container {
+                                        max-width: none;
+                                    }
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="resume-container">
+                                <div class="header">
+                                    <div class="name">${this.resumeData.personalInfo.fullName || 'Your Name'}</div>
+                                    <div class="contact-info">
+                                        ${this.resumeData.personalInfo.email ? `<div>${this.resumeData.personalInfo.email}</div>` : ''}
+                                        ${this.resumeData.personalInfo.phone ? `<div>${this.resumeData.personalInfo.phone}</div>` : ''}
+                                        ${this.resumeData.personalInfo.address ? `<div>${this.resumeData.personalInfo.address}</div>` : ''}
+                                        ${this.resumeData.personalInfo.linkedIn ? `<div>${this.resumeData.personalInfo.linkedIn}</div>` : ''}
+                                        ${this.resumeData.personalInfo.website ? `<div>${this.resumeData.personalInfo.website}</div>` : ''}
+                                    </div>
+                                </div>
+
+                                ${this.resumeData.personalInfo.summary ? `
+                                    <div class="section">
+                                        <div class="section-title">Professional Summary</div>
+                                        <div class="entry-description">${this.resumeData.personalInfo.summary}</div>
+                                    </div>
+                                ` : ''}
+
+                                ${this.resumeData.experience.length > 0 ? `
+                                    <div class="section">
+                                        <div class="section-title">Work Experience</div>
+                                        ${this.resumeData.experience.map(exp => `
+                                            <div class="entry">
+                                                <div class="entry-header">
+                                                    <div class="entry-title">${exp.position || 'Position'}</div>
+                                                    <div class="entry-date">${formatDate(exp.startDate)} - ${exp.current ? 'Present' : formatDate(exp.endDate)}</div>
+                                                </div>
+                                                <div class="entry-subtitle">${exp.company}${exp.location ? ` • ${exp.location}` : ''}</div>
+                                                <div class="entry-description">${exp.description || ''}</div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                ` : ''}
+
+                                ${this.resumeData.education.length > 0 ? `
+                                    <div class="section">
+                                        <div class="section-title">Education</div>
+                                        ${this.resumeData.education.map(edu => `
+                                            <div class="entry">
+                                                <div class="entry-header">
+                                                    <div class="entry-title">${edu.degree || 'Degree'} in ${edu.field || 'Field'}</div>
+                                                    <div class="entry-date">${formatDate(edu.startDate)} - ${formatDate(edu.endDate)}</div>
+                                                </div>
+                                                <div class="entry-subtitle">${edu.institution}${edu.gpa ? ` • GPA: ${edu.gpa}` : ''}</div>
+                                                ${edu.description ? `<div class="entry-description">${edu.description}</div>` : ''}
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                ` : ''}
+
+                                ${this.resumeData.projects.length > 0 ? `
+                                    <div class="section">
+                                        <div class="section-title">Projects</div>
+                                        ${this.resumeData.projects.map(project => `
+                                            <div class="entry">
+                                                <div class="entry-header">
+                                                    <div class="entry-title">${project.name || 'Project Name'}</div>
+                                                    <div class="entry-date">${formatDate(project.startDate)} - ${project.current ? 'Present' : formatDate(project.endDate)}</div>
+                                                </div>
+                                                ${project.technologies ? `<div class="entry-subtitle">Technologies: ${project.technologies}</div>` : ''}
+                                                ${project.url ? `<div class="entry-subtitle"><a href="${project.url}" target="_blank">View Project</a></div>` : ''}
+                                                <div class="entry-description">${project.description || ''}</div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                ` : ''}
+
+                                ${this.resumeData.skills.filter(skill => skill.trim()).length > 0 ? `
+                                    <div class="section">
+                                        <div class="section-title">Skills</div>
+                                        <div class="skills-list">
+                                            ${this.resumeData.skills.filter(skill => skill.trim()).map(skill => `
+                                                <span class="skill-tag">${skill}</span>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </body>
+                        </html>
+                    `;
+                }
             };
             
-            // Export PDF
-            window.resumeBuilder.exportToPDF();
+            // Open print page
+            const printWindow = window.open('', '_blank');
+            const printContent = tempBuilder.generatePDFHTML();
             
-            // Restore original data
-            window.resumeBuilder.resumeData = originalData;
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            
+            // Wait for content to load, then trigger print dialog
+            printWindow.onload = function() {
+                printWindow.focus();
+                printWindow.print();
+            };
+        } else {
+            alert('Resume not found or error loading resume.');
         }
     } catch (error) {
-        console.error('Error downloading resume:', error);
-        alert('Error downloading resume. Please try again.');
+        console.error('Error printing resume:', error);
+        alert('Error printing resume. Please try again.');
     }
+}
+
+// Function to download a resume (keeping for backward compatibility)
+async function downloadResume(resumeId) {
+    // Redirect to print function
+    return printResume(resumeId);
 }
 
 // Function to delete a resume
@@ -1448,10 +1870,12 @@ async function deleteResume(resumeId) {
     }
     
     try {
+        const token = sessionStorage.getItem('authToken');
         const response = await fetch('api.php?endpoint=resumes', {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {})
             },
             body: JSON.stringify({ id: resumeId })
         });

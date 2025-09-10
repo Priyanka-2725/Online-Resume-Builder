@@ -119,8 +119,8 @@ async function handleLogin(event) {
             localStorage.setItem('user', JSON.stringify(result.user));
             sessionStorage.setItem('authToken', result.token);
             
-            // Redirect to resume builder
-            window.location.href = 'index.html';
+            // Redirect to My Resumes view
+            window.location.href = 'index.html?view=my-resumes';
         } else {
             showError(result.message || 'Login failed. Please try again.');
         }
@@ -187,8 +187,8 @@ async function handleSignup(event) {
             // Show success message and redirect
             showSuccess('Account created successfully! Redirecting to resume builder...');
             setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1500);
+                window.location.href = 'index.html?view=my-resumes';
+            }, 1000);
         } else {
             showError(result.message || 'Signup failed. Please try again.');
         }
@@ -229,7 +229,7 @@ function updateNavbarForLoggedInUser(user) {
     userMenu.innerHTML = `
         <div class="user-menu">
             <span class="user-greeting">Hi, ${user.name}!</span>
-            <a href="index.html" class="nav-link">My Resumes</a>
+            <a href="index.html?view=my-resumes" class="nav-link">My Resumes</a>
             <a href="#" class="nav-link" onclick="logout()">Logout</a>
         </div>
     `;

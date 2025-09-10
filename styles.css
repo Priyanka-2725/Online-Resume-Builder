@@ -344,6 +344,43 @@ body {
     flex: 1;
 }
 
+/* Project Items */
+.project-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.project-item .form-group {
+    margin-bottom: 15px;
+}
+
+.project-item .form-group:last-of-type {
+    margin-bottom: 20px;
+}
+
+.project-item label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.project-item input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+.project-item .remove-project {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 5px 10px;
+    font-size: 12px;
+}
+
 /* Template Selection */
 .template-selection {
     display: grid;
