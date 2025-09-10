@@ -1292,3 +1292,25 @@ body {
     }
 }
 
+/* Dark mode for completion overlay */
+.dark .completion-message {
+    background: linear-gradient(135deg, #0a1f44 0%, #111827 50%, #0b1220 100%);
+}
+.dark .completion-content {
+    background: #0b1220;
+    color: #ffffff;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+.dark .completion-content h2 { color: #ffffff; }
+.dark .completion-content p { color: #ffffff; }
+.dark .completion-actions .btn-primary { color: #ffffff; }
+.dark .completion-actions .btn-secondary {
+    background: transparent;
+    color: #ffffff;
+    border: 2px solid #374151;
+}
+.dark .completion-actions .btn-secondary:hover {
+    background: #111827;
+    box-shadow: none;
+}
+
