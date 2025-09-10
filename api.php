@@ -115,7 +115,11 @@ switch ($endpoint) {
         handleResumes();
         break;
     case 'download':
-        handleDownload();
+        if ($method === 'POST') {
+            handleDownloadPost();
+        } else {
+            handleDownload();
+        }
         break;
     case 'templates':
         handleTemplates();
@@ -195,6 +199,7 @@ function getResumes() {
                 $resume['experience'] = json_decode($resume['experience'], true);
                 $resume['skills'] = json_decode($resume['skills'], true);
                 $resume['projects'] = json_decode($resume['projects'] ?? '[]', true);
+                $resume['achievements'] = json_decode($resume['achievements'] ?? '[]', true);
             }
             
             sendSuccess($resumes);
@@ -229,6 +234,7 @@ function createResume() {
         'experience' => $input['experience'] ?? [],
         'skills' => $input['skills'] ?? [],
         'projects' => $input['projects'] ?? [],
+        'achievements' => $input['achievements'] ?? [],
         'template' => $input['template'] ?? 'modern',
         'created_at' => date('Y-m-d H:i:s'),
         'updated_at' => date('Y-m-d H:i:s')
@@ -241,10 +247,10 @@ function createResume() {
         sendSuccess($resume, 'Resume created successfully');
     } else {
         try {
-            $stmt = $pdo->prepare("
-                INSERT INTO resumes (id, user_id, title, personal_info, education, experience, skills, projects, template, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ");
+            $stmt = $pdo->prepare(
+                "INSERT INTO resumes (id, user_id, title, personal_info, education, experience, skills, projects, achievements, template, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            );
             
             $stmt->execute([
                 $resume['id'],
@@ -255,6 +261,7 @@ function createResume() {
                 json_encode($resume['experience']),
                 json_encode($resume['skills']),
                 json_encode($resume['projects']),
+                json_encode($resume['achievements']),
                 $resume['template'],
                 $resume['created_at'],
                 $resume['updated_at']
@@ -291,6 +298,7 @@ function updateResume() {
         'experience' => $input['experience'] ?? [],
         'skills' => $input['skills'] ?? [],
         'projects' => $input['projects'] ?? [],
+        'achievements' => $input['achievements'] ?? [],
         'template' => $input['template'] ?? 'modern',
         'updated_at' => date('Y-m-d H:i:s')
     ];
@@ -316,11 +324,11 @@ function updateResume() {
         sendSuccess($resume, 'Resume updated successfully');
     } else {
         try {
-            $stmt = $pdo->prepare("
-                UPDATE resumes 
-                SET title = ?, personal_info = ?, education = ?, experience = ?, skills = ?, projects = ?, template = ?, updated_at = ?
-                WHERE id = ? AND user_id = ?
-            ");
+            $stmt = $pdo->prepare(
+                "UPDATE resumes 
+                 SET title = ?, personal_info = ?, education = ?, experience = ?, skills = ?, projects = ?, achievements = ?, template = ?, updated_at = ?
+                 WHERE id = ? AND user_id = ?"
+            );
             
             $result = $stmt->execute([
                 $resume['title'],
@@ -329,6 +337,7 @@ function updateResume() {
                 json_encode($resume['experience']),
                 json_encode($resume['skills']),
                 json_encode($resume['projects']),
+                json_encode($resume['achievements']),
                 $resume['template'],
                 $resume['updated_at'],
                 $resume['id'],
@@ -430,6 +439,8 @@ function handleDownload() {
                 $resume['education'] = json_decode($resume['education'], true);
                 $resume['experience'] = json_decode($resume['experience'], true);
                 $resume['skills'] = json_decode($resume['skills'], true);
+                $resume['projects'] = json_decode($resume['projects'] ?? '[]', true);
+                $resume['achievements'] = json_decode($resume['achievements'] ?? '[]', true);
             }
         } catch (PDOException $e) {
             sendError('Database error: ' . $e->getMessage(), 500);
@@ -446,6 +457,8 @@ function handleDownload() {
     $education = $resume['education'] ?? [];
     $experience = $resume['experience'] ?? [];
     $skills = $resume['skills'] ?? [];
+    $projects = $resume['projects'] ?? [];
+    $achievements = $resume['achievements'] ?? [];
     
     // Get template for formatting
     $template = $resume['template'] ?? 'modern';
@@ -548,6 +561,31 @@ function handleDownload() {
         }
     }
     
+    if (!empty($projects)) {
+        $lines[] = '';
+        $lines[] = 'PROJECTS';
+        foreach ($projects as $project) {
+            $header = ($project['name'] ?? 'Project');
+            $dates = trim(($project['startDate'] ?? '') . ((isset($project['endDate']) && $project['endDate']) ? ' - ' . $project['endDate'] : ''));
+            $lines[] = $header;
+            if ($dates) { $lines[] = $dates; }
+            if (!empty($project['technologies'])) { $lines[] = 'Tech: ' . $project['technologies']; }
+            if (!empty($project['description'])) { $lines[] = $project['description']; }
+            $lines[] = '';
+        }
+    }
+    if (!empty($achievements)) {
+        $lines[] = '';
+        $lines[] = 'ACHIEVEMENTS';
+        foreach ($achievements as $ach) {
+            $header = ($ach['title'] ?? 'Achievement') . (!empty($ach['issuer']) ? ' — ' . $ach['issuer'] : '');
+            $lines[] = $header;
+            if (!empty($ach['date'])) { $lines[] = $ach['date']; }
+            if (!empty($ach['description'])) { $lines[] = $ach['description']; }
+            $lines[] = '';
+        }
+    }
+    
     $pdf = buildSimplePdf($lines, $resume);
     
     $safeTitle = preg_replace('/[^A-Za-z0-9-_]+/', '_', $title);
@@ -559,6 +597,230 @@ function handleDownload() {
     header('Content-Length: ' . strlen($pdf));
     echo $pdf;
     exit();
+}
+
+function handleDownloadPost() {
+    global $pdo, $useFileStorage;
+
+    $input = json_decode(file_get_contents('php://input'), true);
+    if (!$input || empty($input['resume'])) {
+        sendError('Resume payload is required', 400);
+    }
+
+    $resume = $input['resume'];
+
+    // Normalize keys between FE and BE
+    $title = $resume['title'] ?? 'Resume';
+    $template = $resume['template'] ?? 'modern';
+
+    // Build HTML using the same structure as JS generatePDFHTML, but respecting selected template sections
+    $html = buildTemplateHtml($resume, $template);
+
+    try {
+        // Generate PDF using Dompdf (support both new and legacy versions)
+        if (!class_exists('Dompdf\\Dompdf') && !class_exists('DOMPDF')) {
+            // Try to include vendor if available
+            if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+                require_once __DIR__ . '/vendor/autoload.php';
+            }
+        }
+
+        if (!class_exists('Dompdf\\Dompdf') && !class_exists('DOMPDF')) {
+            sendError('PDF engine (Dompdf) not installed on server.', 500);
+        }
+
+        // Suppress warnings for legacy Dompdf
+        $oldErrorReporting = error_reporting(E_ERROR | E_PARSE);
+        
+        // Instantiate depending on available class
+        if (class_exists('Dompdf\\Dompdf')) {
+            $dompdf = new Dompdf\Dompdf();
+            $dompdf->loadHtml($html, 'UTF-8');
+            $dompdf->setPaper('A4', 'portrait');
+            $dompdf->render();
+        } else {
+            // Legacy 0.6.x API
+            $dompdf = new DOMPDF();
+            if (method_exists($dompdf, 'load_html')) {
+                $dompdf->load_html($html);
+            } else {
+                $dompdf->loadHtml($html);
+            }
+            if (method_exists($dompdf, 'set_paper')) {
+                $dompdf->set_paper('a4', 'portrait');
+            } else {
+                $dompdf->setPaper('A4', 'portrait');
+            }
+            $dompdf->render();
+        }
+
+        // Restore error reporting
+        error_reporting($oldErrorReporting);
+
+        $pdfOutput = $dompdf->output();
+
+        if (empty($pdfOutput)) {
+            sendError('PDF generation failed - empty output', 500);
+        }
+
+        $safeTitle = preg_replace('/[^A-Za-z0-9-_]+/', '_', $title);
+        $filename = ($safeTitle ?: 'resume') . '.pdf';
+
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Content-Length: ' . strlen($pdfOutput));
+        echo $pdfOutput;
+        exit();
+        
+    } catch (Exception $e) {
+        // Restore error reporting in case of exception
+        if (isset($oldErrorReporting)) {
+            error_reporting($oldErrorReporting);
+        }
+        sendError('PDF generation failed: ' . $e->getMessage(), 500);
+    }
+}
+
+function buildTemplateHtml($data, $template) {
+    $pi = $data['personalInfo'] ?? $data['personal_info'] ?? [];
+    $experience = $data['experience'] ?? [];
+    $education = $data['education'] ?? [];
+    $skills = $data['skills'] ?? [];
+    $projects = $data['projects'] ?? [];
+    $achievements = $data['achievements'] ?? [];
+
+    $formatDate = function($ym) {
+        if (!$ym) return '';
+        return date('M Y', strtotime($ym . '-01'));
+    };
+
+    $css = '
+        @page { margin: 0.5in; }
+        body { font-family: Arial, sans-serif; color: #333; }
+        .resume { max-width: 800px; margin: 0 auto; }
+        .header { padding-bottom: 15px; margin-bottom: 20px; border-bottom: 3px solid ' . ($template === 'modern' ? '#2563eb' : '#1f2937') . '; ' . ($template === 'classic' ? 'text-align:center;' : '') . ' }
+        .name { font-size: 28px; font-weight: bold; color: #1f2937; }
+        .contact { color: #6b7280; font-size: 12px; line-height: 1.4; }
+        .section { margin-bottom: 20px; }
+        .section-title { font-size: 16px; font-weight: bold; color: #1f2937; margin-bottom: 8px; ' . ($template === 'modern' ? 'border-bottom:1px solid #d1d5db;padding-bottom:4px;' : 'text-transform:uppercase;letter-spacing:1px;') . ' }
+        .entry { margin-bottom: 12px; }
+        .entry-header { display:flex; justify-content: space-between; align-items: flex-start; }
+        .entry-title { font-size: 14px; font-weight: 600; color: #1f2937; }
+        .entry-date { color:#6b7280; font-size: 12px; white-space: nowrap; }
+        .entry-sub { color: ' . ($template === 'modern' ? '#2563eb' : '#6b7280') . '; font-size: 13px; margin: 2px 0 6px; }
+        .entry-desc { font-size: 13px; line-height: 1.6; white-space: pre-line; }
+        .skills { display:flex; flex-wrap: wrap; gap:6px; }
+        .tag { background:#dbeafe; color:#1e40af; padding:3px 10px; border-radius: 20px; font-size:12px; }
+    ';
+
+    $contactLine = [];
+    if (!empty($pi['email'])) $contactLine[] = $pi['email'];
+    if (!empty($pi['phone'])) $contactLine[] = $pi['phone'];
+    if (!empty($pi['address'])) $contactLine[] = $pi['address'];
+    if (!empty($pi['linkedIn'])) $contactLine[] = $pi['linkedIn'];
+    if (!empty($pi['website'])) $contactLine[] = $pi['website'];
+
+    $html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>' . $css . '</style></head><body><div class="resume">';
+    $html .= '<div class="header">';
+    $html .= '<div class="name">' . htmlspecialchars($pi['fullName'] ?? 'Your Name') . '</div>';
+    if (!empty($contactLine)) {
+        $html .= '<div class="contact">' . htmlspecialchars(implode($template === 'modern' ? ' • ' : ' | ', $contactLine)) . '</div>'; 
+    }
+    $html .= '</div>';
+
+    if (!empty($pi['summary'])) {
+        $html .= '<div class="section">';
+        $html .= '<div class="section-title">' . ($template === 'modern' ? 'Professional Summary' : 'Objective') . '</div>';
+        $html .= '<div class="entry-desc">' . nl2br(htmlspecialchars($pi['summary'])) . '</div>';
+        $html .= '</div>';
+    }
+
+    if (!empty($experience)) {
+        $html .= '<div class="section">';
+        $html .= '<div class="section-title">' . ($template === 'modern' ? 'Work Experience' : 'Experience') . '</div>';
+        foreach ($experience as $exp) {
+            $html .= '<div class="entry">';
+            $html .= '<div class="entry-header">';
+            $html .= '<div class="entry-title">' . htmlspecialchars(($template === 'classic' ? (($exp['position'] ?? 'Position') . (isset($exp['company']) && $exp['company'] ? ', ' . $exp['company'] : '')) : ($exp['position'] ?? 'Position'))) . '</div>';
+            $html .= '<div class="entry-date">' . htmlspecialchars(($formatDate($exp['startDate'] ?? '') ?: '') . ' - ' . ((isset($exp['current']) && $exp['current']) ? 'Present' : ($formatDate($exp['endDate'] ?? '') ?: ''))) . '</div>';
+            $html .= '</div>';
+            if ($template === 'modern') {
+                $sub = [];
+                if (!empty($exp['company'])) $sub[] = $exp['company'];
+                if (!empty($exp['location'])) $sub[] = $exp['location'];
+                if (!empty($sub)) $html .= '<div class="entry-sub">' . htmlspecialchars(implode(' • ', $sub)) . '</div>';
+            } else if (!empty($exp['location'])) {
+                $html .= '<div class="entry-sub">' . htmlspecialchars($exp['location']) . '</div>';
+            }
+            if (!empty($exp['description'])) $html .= '<div class="entry-desc">' . nl2br(htmlspecialchars($exp['description'])) . '</div>';
+            $html .= '</div>';
+        }
+        $html .= '</div>';
+    }
+
+    if (!empty($education)) {
+        $html .= '<div class="section">';
+        $html .= '<div class="section-title">Education</div>';
+        foreach ($education as $edu) {
+            $html .= '<div class="entry">';
+            $html .= '<div class="entry-header">';
+            $html .= '<div class="entry-title">' . htmlspecialchars(($edu['degree'] ?? 'Degree') . (!empty($edu['field']) ? ' in ' . $edu['field'] : '')) . '</div>';
+            $html .= '<div class="entry-date">' . htmlspecialchars(($formatDate($edu['startDate'] ?? '') ?: '') . ' - ' . ($formatDate($edu['endDate'] ?? '') ?: '')) . '</div>';
+            $html .= '</div>';
+            $inst = htmlspecialchars(($edu['institution'] ?? '')) . (!empty($edu['gpa']) ? ' • GPA: ' . htmlspecialchars($edu['gpa']) : '');
+            if ($inst) $html .= '<div class="entry-sub">' . $inst . '</div>';
+            if (!empty($edu['description'])) $html .= '<div class="entry-desc">' . nl2br(htmlspecialchars($edu['description'])) . '</div>';
+            $html .= '</div>';
+        }
+        $html .= '</div>';
+    }
+
+    if (!empty($projects)) {
+        $html .= '<div class="section">';
+        $html .= '<div class="section-title">' . ($template === 'modern' ? 'Projects' : 'Projects') . '</div>';
+        foreach ($projects as $project) {
+            $html .= '<div class="entry">';
+            $html .= '<div class="entry-header">';
+            $html .= '<div class="entry-title">' . htmlspecialchars($project['name'] ?? 'Project Name') . '</div>';
+            $html .= '<div class="entry-date">' . htmlspecialchars(($formatDate($project['startDate'] ?? '') ?: '') . ' - ' . ((isset($project['current']) && $project['current']) ? 'Present' : ($formatDate($project['endDate'] ?? '') ?: ''))) . '</div>';
+            $html .= '</div>';
+            if (!empty($project['technologies'])) $html .= '<div class="entry-sub">' . htmlspecialchars('Technologies: ' . $project['technologies']) . '</div>';
+            if (!empty($project['url'])) $html .= '<div class="entry-sub">' . '<a href="' . htmlspecialchars($project['url']) . '">' . 'View Project' . '</a>' . '</div>';
+            if (!empty($project['description'])) $html .= '<div class="entry-desc">' . nl2br(htmlspecialchars($project['description'])) . '</div>';
+            $html .= '</div>';
+        }
+        $html .= '</div>';
+    }
+
+    if (!empty($achievements)) {
+        $html .= '<div class="section">';
+        $html .= '<div class="section-title">' . ($template === 'modern' ? 'Achievements' : 'Achievements') . '</div>';
+        foreach ($achievements as $ach) {
+            $html .= '<div class="entry">';
+            $html .= '<div class="entry-header">';
+            $html .= '<div class="entry-title">' . htmlspecialchars($ach['title'] ?? 'Achievement') . (!empty($ach['issuer']) && $template === 'classic' ? ', ' . htmlspecialchars($ach['issuer']) : '') . '</div>';
+            $html .= '<div class="entry-date">' . htmlspecialchars($formatDate($ach['date'] ?? '')) . '</div>';
+            $html .= '</div>';
+            if (!empty($ach['issuer']) && $template === 'modern') $html .= '<div class="entry-sub">' . htmlspecialchars($ach['issuer']) . '</div>';
+            if (!empty($ach['description'])) $html .= '<div class="entry-desc">' . nl2br(htmlspecialchars($ach['description'])) . '</div>';
+            $html .= '</div>';
+        }
+        $html .= '</div>';
+    }
+
+    $skillsFiltered = array_values(array_filter(array_map('trim', $skills)));
+    if (!empty($skillsFiltered)) {
+        $html .= '<div class="section">';
+        $html .= '<div class="section-title">Skills</div>';
+        $html .= '<div class="skills">';
+        foreach ($skillsFiltered as $skill) {
+            $html .= '<span class="tag">' . htmlspecialchars($skill) . '</span>';
+        }
+        $html .= '</div></div>';
+    }
+
+    $html .= '</div></body></html>';
+    return $html;
 }
 
 function buildSimplePdf($lines, $resumeData = null) {
@@ -580,6 +842,8 @@ function buildSimplePdf($lines, $resumeData = null) {
     $experience = $resume['experience'] ?? [];
     $education = $resume['education'] ?? [];
     $skills = $resume['skills'] ?? [];
+    $projects = $resume['projects'] ?? [];
+    $achievements = $resume['achievements'] ?? [];
     
     // Create PDF with proper formatting
     $pdf = "%PDF-1.4\n";
@@ -763,6 +1027,98 @@ function buildSimplePdf($lines, $resumeData = null) {
             }
         }
         
+        // Projects section - Modern style
+        if (!empty($projects)) {
+            $y -= 15;
+            $content .= "1 0 0 1 72 $y Tm\n"; // Left align
+            $content .= "/F1 20 Tf\n"; // Bold
+            $content .= "(PROJECTS) Tj\n";
+            $y -= 25;
+            
+            foreach ($projects as $project) {
+                $name = $project['name'] ?? '';
+                $dates = trim(($project['startDate'] ?? '') . ((isset($project['endDate']) && $project['endDate']) ? ' - ' . $project['endDate'] : ''));
+                $tech = $project['technologies'] ?? '';
+                $desc = $project['description'] ?? '';
+                
+                if ($name) {
+                    $content .= "1 0 0 1 72 $y Tm\n"; // Left align
+                    $content .= "/F1 16 Tf\n"; // Bold
+                    $content .= "(" . pdf_escape_text($name) . ") Tj\n";
+                    $y -= 20;
+                }
+                
+                if ($dates) {
+                    $content .= "1 0 0 1 72 $y Tm\n"; // Left align
+                    $content .= "/F2 14 Tf\n"; // Regular
+                    $content .= "(" . pdf_escape_text($dates) . ") Tj\n";
+                    $y -= 18;
+                }
+                
+                if ($tech) {
+                    $content .= "1 0 0 1 72 $y Tm\n"; // Left align
+                    $content .= "/F2 14 Tf\n"; // Regular
+                    $content .= "(" . pdf_escape_text('Tech: ' . $tech) . ") Tj\n";
+                    $y -= 18;
+                }
+                
+                if ($desc) {
+                    $content .= "1 0 0 1 72 $y Tm\n"; // Left align
+                    $content .= "/F2 14 Tf\n"; // Regular
+                    $content .= "(" . pdf_escape_text($desc) . ") Tj\n";
+                    $y -= 20;
+                }
+                
+                $y -= 10; // Space between entries
+            }
+        }
+
+        // Achievements section - Modern style
+        if (!empty($achievements)) {
+            $y -= 15;
+            $content .= "1 0 0 1 72 $y Tm\n"; // Left align
+            $content .= "/F1 20 Tf\n"; // Bold
+            $content .= "(ACHIEVEMENTS) Tj\n";
+            $y -= 25;
+
+            foreach ($achievements as $ach) {
+                $title = $ach['title'] ?? '';
+                $issuer = $ach['issuer'] ?? '';
+                $date = $ach['date'] ?? '';
+                $desc = $ach['description'] ?? '';
+
+                if ($title) {
+                    $content .= "1 0 0 1 72 $y Tm\n"; // Left align
+                    $content .= "/F1 16 Tf\n"; // Bold
+                    $content .= "(" . pdf_escape_text($title) . ") Tj\n";
+                    $y -= 20;
+                }
+
+                if ($issuer) {
+                    $content .= "1 0 0 1 72 $y Tm\n"; // Left align
+                    $content .= "/F2 14 Tf\n"; // Regular
+                    $content .= "(" . pdf_escape_text($issuer) . ") Tj\n";
+                    $y -= 18;
+                }
+
+                if ($date) {
+                    $content .= "1 0 0 1 72 $y Tm\n"; // Left align
+                    $content .= "/F2 12 Tf\n"; // Smaller
+                    $content .= "(" . pdf_escape_text($date) . ") Tj\n";
+                    $y -= 16;
+                }
+
+                if ($desc) {
+                    $content .= "1 0 0 1 72 $y Tm\n"; // Left align
+                    $content .= "/F2 14 Tf\n"; // Regular
+                    $content .= "(" . pdf_escape_text($desc) . ") Tj\n";
+                    $y -= 20;
+                }
+
+                $y -= 10; // Space between entries
+            }
+        }
+        
     } else {
         // Classic template: Traditional layout with pipe separators
         // Header section - centered
@@ -914,6 +1270,98 @@ function buildSimplePdf($lines, $resumeData = null) {
                 $content .= "(" . pdf_escape_text($skillsLine) . ") Tj\n";
             }
         }
+
+        // Projects section - Classic style
+        if (!empty($projects)) {
+            $y -= 10;
+            $content .= "1 0 0 1 72 $y Tm\n"; // Left align
+            $content .= "/F1 20 Tf\n"; // Bold
+            $content .= "(PROJECTS) Tj\n";
+            $y -= 25;
+
+            foreach ($projects as $project) {
+                $name = $project['name'] ?? '';
+                $dates = trim(($project['startDate'] ?? '') . ((isset($project['endDate']) && $project['endDate']) ? ' - ' . $project['endDate'] : ''));
+                $tech = $project['technologies'] ?? '';
+                $desc = $project['description'] ?? '';
+
+                if ($name) {
+                    $content .= "1 0 0 1 72 $y Tm\n"; // Left align
+                    $content .= "/F1 16 Tf\n"; // Bold
+                    $content .= "(" . pdf_escape_text($name) . ") Tj\n";
+                    $y -= 20;
+                }
+
+                if ($dates) {
+                    $content .= "1 0 0 1 72 $y Tm\n"; // Left align
+                    $content .= "/F2 14 Tf\n"; // Regular
+                    $content .= "(" . pdf_escape_text($dates) . ") Tj\n";
+                    $y -= 18;
+                }
+
+                if ($tech) {
+                    $content .= "1 0 0 1 72 $y Tm\n"; // Left align
+                    $content .= "/F2 14 Tf\n"; // Regular
+                    $content .= "(" . pdf_escape_text('Tech: ' . $tech) . ") Tj\n";
+                    $y -= 18;
+                }
+
+                if ($desc) {
+                    $content .= "1 0 0 1 72 $y Tm\n"; // Left align
+                    $content .= "/F2 14 Tf\n"; // Regular
+                    $content .= "(" . pdf_escape_text($desc) . ") Tj\n";
+                    $y -= 20;
+                }
+
+                $y -= 10; // Space between entries
+            }
+        }
+
+        // Achievements section - Classic style
+        if (!empty($achievements)) {
+            $y -= 10;
+            $content .= "1 0 0 1 72 $y Tm\n"; // Left align
+            $content .= "/F1 20 Tf\n"; // Bold
+            $content .= "(ACHIEVEMENTS) Tj\n";
+            $y -= 25;
+
+            foreach ($achievements as $ach) {
+                $title = $ach['title'] ?? '';
+                $issuer = $ach['issuer'] ?? '';
+                $date = $ach['date'] ?? '';
+                $desc = $ach['description'] ?? '';
+
+                if ($title) {
+                    $content .= "1 0 0 1 72 $y Tm\n"; // Left align
+                    $content .= "/F1 16 Tf\n"; // Bold
+                    $content .= "(" . pdf_escape_text($title) . ") Tj\n";
+                    $y -= 20;
+                }
+
+                if ($issuer) {
+                    $content .= "1 0 0 1 72 $y Tm\n"; // Left align
+                    $content .= "/F2 14 Tf\n"; // Regular
+                    $content .= "(" . pdf_escape_text($issuer) . ") Tj\n";
+                    $y -= 18;
+                }
+
+                if ($date) {
+                    $content .= "1 0 0 1 72 $y Tm\n"; // Left align
+                    $content .= "/F2 12 Tf\n"; // Smaller
+                    $content .= "(" . pdf_escape_text($date) . ") Tj\n";
+                    $y -= 16;
+                }
+
+                if ($desc) {
+                    $content .= "1 0 0 1 72 $y Tm\n"; // Left align
+                    $content .= "/F2 14 Tf\n"; // Regular
+                    $content .= "(" . pdf_escape_text($desc) . ") Tj\n";
+                    $y -= 20;
+                }
+
+                $y -= 10; // Space between entries
+            }
+        }
     }
     
     $content .= "ET\n";
@@ -983,6 +1431,7 @@ function setupDatabase() {
             experience JSON,
             skills JSON,
             projects JSON,
+            achievements JSON,
             template VARCHAR(50) DEFAULT 'modern',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -990,11 +1439,16 @@ function setupDatabase() {
         
         $pdo->exec($sql);
         
-        // Add projects column if it doesn't exist (for existing databases)
+        // Add projects/achievements columns if they don't exist (for existing databases)
         try {
             $pdo->exec("ALTER TABLE resumes ADD COLUMN projects JSON AFTER skills");
         } catch (PDOException $e) {
-            // Column might already exist, ignore error
+            // ignore
+        }
+        try {
+            $pdo->exec("ALTER TABLE resumes ADD COLUMN achievements JSON AFTER projects");
+        } catch (PDOException $e) {
+            // ignore
         }
         
         sendSuccess(null, 'Database setup completed');

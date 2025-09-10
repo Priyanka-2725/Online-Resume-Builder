@@ -1,95 +1,5 @@
 [
     {
-        "id": "689e4a80764cd1.50491128",
-        "user_id": "user_6890711b510e93.04769488",
-        "title": "Software Engineer ",
-        "personal_info": {
-            "fullName": "Priyanka Singh",
-            "email": "priyankasingh15102004@gmail.com",
-            "phone": "+918957126509",
-            "address": "Jr. 48 A, Renusagar Colony, Renusagar",
-            "linkedIn": "linkedin.com\/in\/priyasharma",
-            "website": "github.com\/priyasharma",
-            "summary": "Detail-oriented and innovative Computer Science undergraduate seeking opportunities to apply technical expertise and problem-solving skills in software development. Passionate about building user-focused applications and contributing to impactful projects."
-        },
-        "education": [
-            {
-                "id": "a8a74088-744b-4045-bb1c-bac78b25df01",
-                "institution": "NIET, G",
-                "degree": "B.Tech in Computer Science & Engineering ",
-                "field": "Computer Science & Engineering ",
-                "startDate": "2025-08",
-                "endDate": "2027-07",
-                "gpa": "9.31",
-                "description": ""
-            }
-        ],
-        "experience": [
-            {
-                "id": "2db64ef0-446a-40e9-8793-c6e239f01ec3",
-                "company": "CodeSoft",
-                "position": "Software Development Intern",
-                "location": "",
-                "startDate": "2025-11",
-                "endDate": "2025-12",
-                "current": true,
-                "description": "Developed GUI-based applications in Python (Tkinter) such as a password generator and a rock-paper-scissors game.\n\nCollaborated with team to enhance UI\/UX and improve program efficiency by 20%."
-            }
-        ],
-        "skills": [
-            "js",
-            "python"
-        ],
-        "template": "modern",
-        "created_at": "2025-08-14 20:43:44",
-        "updated_at": "2025-08-14 20:43:44"
-    },
-    {
-        "id": "68b80b27acf1b4.45903597",
-        "user_id": "user_6890711b510e93.04769488",
-        "title": "Software Engineer ",
-        "personal_info": {
-            "fullName": "Priyanka Singh",
-            "email": "priyankasingh15102004@gmail.com",
-            "phone": "+918957126509",
-            "address": "Jr. 48 A, Renusagar Colony, Renusagar",
-            "linkedIn": "linkedin.com\/in\/priyasharma",
-            "website": "github.com\/priyasharma",
-            "summary": "Detail-oriented and innovative Computer Science undergraduate seeking opportunities to apply technical expertise and problem-solving skills in software development. Passionate about building user-focused applications and contributing to impactful projects."
-        },
-        "education": [
-            {
-                "id": "a8a74088-744b-4045-bb1c-bac78b25df01",
-                "institution": "NIET, G",
-                "degree": "B.Tech in Computer Science & Engineering ",
-                "field": "Computer Science & Engineering ",
-                "startDate": "2025-08",
-                "endDate": "2027-07",
-                "gpa": "9.31",
-                "description": ""
-            }
-        ],
-        "experience": [
-            {
-                "id": "2db64ef0-446a-40e9-8793-c6e239f01ec3",
-                "company": "CodeSoft",
-                "position": "Software Development Intern",
-                "location": "",
-                "startDate": "2025-11",
-                "endDate": "2025-12",
-                "current": true,
-                "description": "Developed GUI-based applications in Python (Tkinter) such as a password generator and a rock-paper-scissors game.\n\nCollaborated with team to enhance UI\/UX and improve program efficiency by 20%."
-            }
-        ],
-        "skills": [
-            "js",
-            "python"
-        ],
-        "template": "classic",
-        "created_at": "2025-09-03 09:32:23",
-        "updated_at": "2025-09-03 09:32:23"
-    },
-    {
         "id": "68bcac71870a38.70792194",
         "user_id": "user_6890711b510e93.04769488",
         "title": "Software Development Engineer \u2013 Backend Intern Resume",
@@ -121,5 +31,147 @@
         "template": "classic",
         "created_at": "2025-09-06 21:49:37",
         "updated_at": "2025-09-06 21:49:37"
+    },
+    {
+        "id": "68c1b3f9dba6a7.86753020",
+        "user_id": "user_6890711b510e93.04769488",
+        "title": "Software Development Engineer \u2013 Backend Intern Resume",
+        "personal_info": {
+            "fullName": "Priyanka Singh",
+            "email": "ps.15102004@gmail.com",
+            "phone": "+91 8957126509",
+            "address": "Greater Noida",
+            "linkedIn": "www.linkedin.com\/in\/priyanka-singh-a1728b233",
+            "website": "",
+            "summary": "Motivated Computer Science student with a proven record of building efficient backend systems and web applications. Passionate about architecting scalable frameworks, solving reliability issues, and contributing to low-code\/no-code platforms. Excited to apply technical expertise and problem-solving skills at Juspay."
+        },
+        "education": [
+            {
+                "id": "c1eb7225-8898-4266-81a4-018bff33f513",
+                "institution": "Noida Institute of Engineering and Technology (NIET)",
+                "degree": "Bachelor of Technology (B.Tech)",
+                "field": "Computer Science and Engineering",
+                "startDate": "2023-10",
+                "endDate": "2027-06",
+                "gpa": "9.31",
+                "description": ""
+            },
+            {
+                "id": "dcaaa47d-8af4-4805-99bc-6fdffd6677a7",
+                "institution": "Aditya Birla Public School",
+                "degree": "Senior Secondary",
+                "field": "PCM with Computer Science",
+                "startDate": "2022-04",
+                "endDate": "2023-03",
+                "gpa": "74.2%",
+                "description": ""
+            }
+        ],
+        "experience": [],
+        "skills": [
+            "Java",
+            "Python",
+            "PHP",
+            "C",
+            "HTML",
+            "CSS",
+            "JavaScript",
+            "BootStrap",
+            "MySQL ",
+            "JDBC",
+            "MongoDB",
+            "OOPs Concepts",
+            "AI\/ML Model Development",
+            "Leadership & Team Management"
+        ],
+        "projects": [
+            {
+                "id": "eab11d50-24b5-4f6d-8589-386d33e56992",
+                "name": "Bookstore Management System",
+                "description": "Java-based system with GUI for customer registration, login, book management, and order processing.",
+                "technologies": "Java, JDBC, MySQL, Swing, OOPs",
+                "url": "",
+                "startDate": "2025-02",
+                "endDate": "2025-04",
+                "current": false
+            },
+            {
+                "id": "ec462685-c88b-4e70-a6fe-953ce7a308cb",
+                "name": "Blessing Box (NGO Platform)",
+                "description": "Web app to list NGOs by state & cause, allowing users to explore and view details easily.",
+                "technologies": "HTML, CSS, JavaScript, MongoDB",
+                "url": "https:\/\/github.com\/Priyanka-2725\/BLESSING-BOX",
+                "startDate": "2025-05",
+                "endDate": "2025-06",
+                "current": true
+            },
+            {
+                "id": "f02d8cdd-de31-40c4-a3eb-7067871750fc",
+                "name": "Online Resume Builder",
+                "description": "Web app enabling users to create and download professional resumes interactively.",
+                "technologies": "HTML, CSS, JavaScript, PHP, DOMPDF",
+                "url": "https:\/\/github.com\/Priyanka-2725\/Online-Resume-Builder",
+                "startDate": "2025-08",
+                "endDate": "2025-09",
+                "current": false
+            },
+            {
+                "id": "11a1ee45-8fcb-46ae-a137-123ef150e5f1",
+                "name": "SIH Project \u2013 AI-Powered Crop Yield Prediction & Optimization",
+                "description": "Developed an AI system with a custom ML model to predict crop yield and optimize farming practices using soil, weather, and regional data. Integrated a voice assistant for farmer-friendly, hands-free interaction and real-time recommendations.",
+                "technologies": "Next.js, Tailwind CSS, FastAPI, Scikit-learn, XGBoost, JSON storage, i18next (multilingual), Web Speech API",
+                "url": "",
+                "startDate": "2025-09",
+                "endDate": "",
+                "current": true
+            }
+        ],
+        "achievements": [
+            {
+                "id": "82e6680a-b447-4663-a5aa-9fa1e7d4c8e0",
+                "title": "2nd Topper \u2013 B.Tech First Year (All Branches)",
+                "issuer": "NIET, Greater Noida",
+                "date": "2024-09",
+                "description": ""
+            },
+            {
+                "id": "08a05be2-ac21-4279-948f-92ce712572a8",
+                "title": "Winner \u2013 GMRT National Science Exhibition",
+                "issuer": "GMRT",
+                "date": "2022-11",
+                "description": ""
+            },
+            {
+                "id": "1f8a2f43-1b17-4f5c-ae06-a1b91bd3abdf",
+                "title": "Winner \u2013 Aditya Birla Group Schools Debate Competition",
+                "issuer": "Aditya Birla Group",
+                "date": "2022-08",
+                "description": ""
+            },
+            {
+                "id": "70623914-0963-4ac8-881e-8fe8ffdc3644",
+                "title": "Olympiad Achievements (IMO, NSO, IEO)",
+                "issuer": "Science Olympiad Foundation",
+                "date": "",
+                "description": "2\u00d7 Silver (IMO), 1\u00d7 Bronze (IMO), 2\u00d7 Silver (NSO), 1\u00d7 Gold (IEO)"
+            },
+            {
+                "id": "d270a436-a502-4aa5-b401-a7b8561ac8e3",
+                "title": "Head Girl \u2013 Aditya Birla Public School",
+                "issuer": "Aditya Birla Public School",
+                "date": "2022-07",
+                "description": "Led school activities, coordinated events, and demonstrated leadership and team management skills."
+            },
+            {
+                "id": "ec4d3774-562b-4879-86de-5d753cde1413",
+                "title": "Artist Award \u2013 Indira Gandhi Rashtriya Gyanpeeth",
+                "issuer": "Indira Gandhi Rashtriya Gyanpeeth",
+                "date": "2019-10",
+                "description": ""
+            }
+        ],
+        "template": "modern",
+        "created_at": "2025-09-10 17:23:05",
+        "updated_at": "2025-09-10 17:23:05"
     }
 ]

@@ -342,6 +342,23 @@ body {
 
 .skill-item input {
     flex: 1;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    background: #ffffff;
+    font-size: 16px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.skill-item input::placeholder {
+    color: #9ca3af;
+}
+
+.skill-item input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12);
+    background: #ffffff;
 }
 
 /* Project Items */
@@ -374,6 +391,24 @@ body {
 }
 
 .project-item .remove-project {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 5px 10px;
+    font-size: 12px;
+}
+
+/* Achievement Items */
+.achievement-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.achievement-item .remove-achievement {
     position: absolute;
     top: 15px;
     right: 15px;

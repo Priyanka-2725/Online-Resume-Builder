@@ -2,7 +2,7 @@
 class ResumeBuilder {
     constructor() {
         this.currentStep = 0;
-        this.totalSteps = 6;
+        this.totalSteps = 7;
         this.resumeData = {
             title: '',
             personalInfo: {
@@ -18,6 +18,7 @@ class ResumeBuilder {
             experience: [],
             skills: [],
             projects: [],
+            achievements: [],
             template: 'modern'
         };
         this.init();
@@ -56,6 +57,10 @@ class ResumeBuilder {
                 this.addProject();
             } else if (e.target.classList.contains('remove-project')) {
                 this.removeProject(e.target.dataset.index);
+            } else if (e.target.classList.contains('add-achievement')) {
+                this.addAchievement();
+            } else if (e.target.classList.contains('remove-achievement')) {
+                this.removeAchievement(e.target.dataset.index);
             }
         });
 
@@ -66,8 +71,11 @@ class ResumeBuilder {
             }
         });
 
-        // PDF Export
-        document.getElementById('exportPDF').addEventListener('click', () => this.exportToPDF());
+        // PDF Download via server (dompdf)
+        const downloadBtn = document.getElementById('downloadPDF');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', () => this.downloadPDF());
+        }
         
         // Load saved resumes on page load
         this.loadSavedResumesList();
@@ -120,6 +128,11 @@ class ResumeBuilder {
                 } else {
                     this.resumeData.projects[index][field] = value;
                 }
+            }
+        } else if (name.startsWith('achievement_')) {
+            const [, index, field] = name.split('_');
+            if (this.resumeData.achievements[index]) {
+                this.resumeData.achievements[index][field] = value;
             }
         }
         
@@ -210,6 +223,7 @@ class ResumeBuilder {
             experience: [],
             skills: [],
             projects: [],
+            achievements: [],
             template: 'modern'
         };
         
@@ -238,6 +252,7 @@ class ResumeBuilder {
         this.addExperience();
         this.addSkill();
         this.addProject();
+        this.addAchievement();
         
         this.updatePreview();
         this.updateCompletionMeter();
@@ -260,7 +275,7 @@ class ResumeBuilder {
         document.getElementById('nextBtn').textContent = this.currentStep === this.totalSteps - 1 ? 'Finish' : 'Next';
         
         // Update step title
-        const stepTitles = ['Personal Information', 'Education', 'Work Experience', 'Skills', 'Projects', 'Template & Preview'];
+        const stepTitles = ['Personal Information', 'Education', 'Work Experience', 'Projects', 'Achievements', 'Skills', 'Template & Preview'];
         document.getElementById('stepTitle').textContent = stepTitles[this.currentStep];
     }
 
@@ -298,16 +313,22 @@ class ResumeBuilder {
                     if (!exp.description.trim()) errors.push(`Experience ${index + 1}: Description is required`);
                 });
                 break;
-            case 3: // Skills
-                const validSkills = this.resumeData.skills.filter(skill => skill.trim());
-                if (validSkills.length === 0) errors.push('At least one skill is required');
-                break;
-            case 4: // Projects
+            case 3: // Projects (moved earlier)
                 // Projects are optional, but if added, must be complete
                 this.resumeData.projects.forEach((project, index) => {
                     if (!project.name.trim()) errors.push(`Project ${index + 1}: Project name is required`);
                     if (!project.description.trim()) errors.push(`Project ${index + 1}: Description is required`);
                 });
+                break;
+            case 4: // Achievements
+                // Achievements are optional, but if added, must be complete
+                this.resumeData.achievements.forEach((ach, index) => {
+                    if (!ach.title.trim()) errors.push(`Achievement ${index + 1}: Title is required`);
+                });
+                break;
+            case 5: // Skills (moved later)
+                const validSkills = this.resumeData.skills.filter(skill => skill.trim());
+                if (validSkills.length === 0) errors.push('At least one skill is required');
                 break;
         }
         
@@ -545,6 +566,55 @@ class ResumeBuilder {
         `).join('');
     }
 
+    // Achievements Management
+    addAchievement() {
+        const achievement = {
+            id: this.generateId(),
+            title: '',
+            issuer: '',
+            date: '',
+            description: ''
+        };
+        this.resumeData.achievements.push(achievement);
+        this.renderAchievementsForm();
+    }
+
+    removeAchievement(index) {
+        this.resumeData.achievements.splice(index, 1);
+        this.renderAchievementsForm();
+        this.updatePreview();
+    }
+
+    renderAchievementsForm() {
+        const container = document.getElementById('achievementsContainer');
+        if (!container) return;
+        container.innerHTML = this.resumeData.achievements.map((ach, index) => `
+            <div class="achievement-item">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Title *</label>
+                        <input type="text" name="achievement_${index}_title" value="${ach.title}" placeholder="e.g., Winner - Hackathon 2024">
+                    </div>
+                    <div class="form-group">
+                        <label>Issuer (Optional)</label>
+                        <input type="text" name="achievement_${index}_issuer" value="${ach.issuer}" placeholder="e.g., Google, University Name">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="month" name="achievement_${index}_date" value="${ach.date}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description (Optional)</label>
+                    <textarea name="achievement_${index}_description" placeholder="Brief details or impact...">${ach.description}</textarea>
+                </div>
+                <button type="button" class="remove-achievement btn-secondary" data-index="${index}">Remove</button>
+            </div>
+        `).join('');
+    }
+
     // Template Selection
     selectTemplate(template) {
         this.resumeData.template = template;
@@ -643,6 +713,22 @@ class ResumeBuilder {
                     </div>
                 ` : ''}
 
+                ${this.resumeData.achievements.length > 0 ? `
+                    <div class="resume-section">
+                        <h2>Achievements</h2>
+                        ${this.resumeData.achievements.map(ach => `
+                            <div class="achievement-entry">
+                                <div class="entry-header">
+                                    <h3>${ach.title || 'Achievement'}</h3>
+                                    <span class="date">${formatDate(ach.date)}</span>
+                                </div>
+                                ${ach.issuer ? `<p class="company">${ach.issuer}</p>` : ''}
+                                ${ach.description ? `<p class="description">${ach.description}</p>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+
                 ${this.resumeData.skills.filter(skill => skill.trim()).length > 0 ? `
                     <div class="resume-section">
                         <h2>Skills</h2>
@@ -731,6 +817,21 @@ class ResumeBuilder {
                     </div>
                 ` : ''}
 
+                ${this.resumeData.achievements.length > 0 ? `
+                    <div class="resume-section">
+                        <h2>ACHIEVEMENTS</h2>
+                        ${this.resumeData.achievements.map(ach => `
+                            <div class="achievement-entry">
+                                <div class="entry-header">
+                                    <h3>${ach.title || 'Achievement'}${ach.issuer ? `, ${ach.issuer}` : ''}</h3>
+                                    <span class="date">${formatDate(ach.date)}</span>
+                                </div>
+                                ${ach.description ? `<p class="description">${ach.description}</p>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+
                 ${this.resumeData.skills.filter(skill => skill.trim()).length > 0 ? `
                     <div class="resume-section">
                         <h2>SKILLS</h2>
@@ -741,25 +842,62 @@ class ResumeBuilder {
         `;
     }
 
-    // PDF Export
-    exportToPDF() {
-        // Open print page instead of direct PDF download
-        this.openPrintPage();
-    }
-
-    // Open print page
-    openPrintPage() {
+    // Server-side PDF download (dompdf)
+    async downloadPDF() {
+        try {
+            const token = sessionStorage.getItem('authToken');
+            const response = await fetch('api.php?endpoint=download', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify({
+                    resume: this.resumeData
+                })
+            });
+            
+            if (!response.ok) {
+                const contentType = response.headers.get('Content-Type') || '';
+                let message = 'Failed to generate PDF';
+                if (contentType.includes('application/json')) {
+                    try {
+                        const j = await response.json();
+                        message = j.error || j.message || message;
+                    } catch {}
+                } else {
+                    try { message = await response.text(); } catch {}
+                }
+                throw new Error(message);
+            }
+            
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const fileName = `${this.resumeData.personalInfo.fullName || 'Resume'}_${new Date().toISOString().split('T')[0]}.pdf`;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Download error:', error);
+            // Graceful fallback to client-side printable HTML if server PDF fails
+            try {
         const printWindow = window.open('', '_blank');
         const printContent = this.generatePDFHTML();
-        
         printWindow.document.write(printContent);
         printWindow.document.close();
-        
-        // Wait for content to load, then trigger print dialog
         printWindow.onload = function() {
             printWindow.focus();
             printWindow.print();
         };
+                alert('Server PDF generation failed. Opening print dialog as fallback. You can save as PDF from there.');
+            } catch (e) {
+                alert('PDF generation failed: ' + (error.message || 'Unknown error') + '. Please try again or contact support.');
+            }
+        }
     }
 
     createPDF() {
@@ -1118,6 +1256,39 @@ class ResumeBuilder {
                         </div>
                     ` : ''}
 
+                    ${this.resumeData.projects.length > 0 ? `
+                        <div class="section">
+                            <div class="section-title">Projects</div>
+                            ${this.resumeData.projects.map(project => `
+                                <div class="entry">
+                                    <div class="entry-header">
+                                        <div class="entry-title">${project.name || 'Project Name'}</div>
+                                        <div class="entry-date">${formatDate(project.startDate)} - ${project.current ? 'Present' : formatDate(project.endDate)}</div>
+                                    </div>
+                                    ${project.technologies ? `<div class="entry-subtitle">Technologies: ${project.technologies}</div>` : ''}
+                                    ${project.url ? `<div class="entry-subtitle"><a href="${project.url}" target="_blank">View Project</a></div>` : ''}
+                                    <div class="entry-description">${project.description || ''}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+
+                    ${this.resumeData.achievements.length > 0 ? `
+                        <div class="section">
+                            <div class="section-title">Achievements</div>
+                            ${this.resumeData.achievements.map(ach => `
+                                <div class="entry">
+                                    <div class="entry-header">
+                                        <div class="entry-title">${ach.title || 'Achievement'}</div>
+                                        <div class="entry-date">${formatDate(ach.date)}</div>
+                                    </div>
+                                    ${ach.issuer ? `<div class="entry-subtitle">${ach.issuer}</div>` : ''}
+                                    ${ach.description ? `<div class="entry-description">${ach.description}</div>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+
                     ${this.resumeData.skills.filter(skill => skill.trim()).length > 0 ? `
                         <div class="section">
                             <div class="section-title">Skills</div>
@@ -1232,6 +1403,7 @@ class ResumeBuilder {
         this.renderExperienceForm();
         this.renderSkillsForm();
         this.renderProjectsForm();
+        this.renderAchievementsForm();
         
         // Template selection
         if (this.resumeData.template) {
@@ -1266,11 +1438,14 @@ class ResumeBuilder {
         // Education (20%)
         if (this.resumeData.education.length > 0) score += 20;
 
-        // Projects (15%)
-        if (this.resumeData.projects.length > 0) score += 15;
+        // Projects (12%)
+        if (this.resumeData.projects.length > 0) score += 12;
 
-        // Skills (10%)
-        if (this.resumeData.skills.filter(skill => skill.trim()).length > 0) score += 10;
+        // Skills (8%)
+        if (this.resumeData.skills.filter(skill => skill.trim()).length > 0) score += 8;
+
+        // Achievements (15%)
+        if (this.resumeData.achievements.length > 0) score += 15;
 
         return Math.round(score);
     }
@@ -1486,6 +1661,7 @@ function createNewResume() {
         experience: [],
         skills: [],
         projects: [],
+        achievements: [],
         template: 'modern'
     };
     window.resumeBuilder.populateForm();
@@ -1597,6 +1773,7 @@ async function editResume(resumeId) {
                 experience: resume.experience || [],
                 skills: resume.skills || [],
                 projects: resume.projects || [],
+                achievements: resume.achievements || [],
                 template: resume.template || 'modern'
             };
             
@@ -1638,6 +1815,8 @@ async function printResume(resumeId) {
                     education: resume.education || [],
                     experience: resume.experience || [],
                     skills: resume.skills || [],
+                    projects: resume.projects || [],
+                    achievements: resume.achievements || [],
                     template: resume.template || 'modern'
                 },
                 generatePDFHTML: function() {
