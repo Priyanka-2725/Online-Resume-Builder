@@ -878,8 +878,8 @@ body {
 .dark .experience-item,
 .dark .project-item,
 .dark .achievement-item {
-    background: #0f172a;
-    border-color: #1f2a44;
+    background: #0f172a !important;
+    border-color: #1f2a44 !important;
 }
 .dark .education-item h4,
 .dark .experience-item h4,
