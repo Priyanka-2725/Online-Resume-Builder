@@ -40,6 +40,17 @@ body {
     z-index: 1000;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
+.header.scrolled {
+    background: rgba(255, 255, 255, 0.98);
+}
+
+.dark .header {
+    background: rgba(17, 24, 39, 0.85) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.dark .header.scrolled {
+    background: rgba(17, 24, 39, 0.95) !important;
+}
 
 .navbar {
     padding: 1rem 0;

@@ -57,17 +57,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check if user is already logged in
     checkLoginStatus();
     
-    // Add scroll effect to navbar with theme awareness
+    // Add scroll effect to navbar via class toggle (avoids inline style conflicts)
     function updateHeaderBg() {
         const header = document.querySelector('.header');
         if (!header) return;
-        const isDark = document.documentElement.classList.contains('dark');
         const scrolled = window.scrollY > 100;
-        if (isDark) {
-            header.style.background = scrolled ? 'rgba(17, 24, 39, 0.95)' : 'rgba(17, 24, 39, 0.85)';
-        } else {
-            header.style.background = scrolled ? 'rgba(255, 255, 255, 0.98)' : 'rgba(255, 255, 255, 0.95)';
-        }
+        header.classList.toggle('scrolled', scrolled);
     }
     window.addEventListener('scroll', updateHeaderBg);
     // Initial set on load
