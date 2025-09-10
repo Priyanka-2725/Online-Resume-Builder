@@ -813,7 +813,7 @@ body {
 /* Dark Mode */
 .dark body {
     background-color: #0b1220;
-    color: #e5e7eb;
+    color: #ffffff;
 }
 .dark .header {
     background: linear-gradient(135deg, #0a1f44 0%, #111827 50%, #0b1220 100%);
@@ -829,14 +829,17 @@ body {
 .dark .form-section h3,
 .dark .preview-section h3,
 .dark .my-resumes-section h2 {
-    color: #e5e7eb;
+    color: #ffffff;
 }
+.dark .step-info { color: #ffffff; }
+.dark .error-container { background-color: #1f2a44; border-color: #334155; }
+.dark .error { color: #fecaca; }
 .dark .form-group label { color: #cbd5e1; }
 .dark .form-group input,
 .dark .form-group textarea,
 .dark .form-group select {
     background: #0f172a;
-    color: #e5e7eb;
+    color: #ffffff;
     border-color: #1f2a44;
 }
 .dark .form-group input:focus,
@@ -847,14 +850,27 @@ body {
 }
 .dark .btn-secondary {
     background: transparent;
-    color: #e5e7eb;
+    color: #ffffff;
     border-color: #374151;
 }
-.dark .resume-preview { background: #0f172a; border-color: #1f2a44; }
-.dark .preview-placeholder { color: #94a3b8; }
+.dark .btn-primary { color: #ffffff; }
+.dark .resume-preview { background: #0f172a; border-color: #1f2a44; color: #ffffff; }
+.dark .preview-placeholder { color: #ffffff; }
+.dark .resume-modern,
+.dark .resume-classic { color: #ffffff; }
+.dark .resume-header h1 { color: #ffffff; }
+.dark .resume-section h2 { color: #ffffff; border-bottom-color: #334155; }
+.dark .entry-header h3 { color: #ffffff; }
+.dark .company,
+.dark .institution,
+.dark .description,
+.dark .contact-info,
+.dark .date,
+.dark .location { color: #ffffff; }
+.dark .skills-container .skill-tag { color: #0b1220; background-color: #93c5fd; }
 .dark .resume-card { background: #0b1220; border-color: #1f2a44; }
 .dark .resume-card h3 { color: #e5e7eb; }
-.dark .resume-card .resume-meta { color: #94a3b8; }
+.dark .resume-card .resume-meta { color: #ffffff; }
 .dark .footer { border-top-color: #1f2a44; color: #94a3b8; }
 
 .resume-card h3 {
