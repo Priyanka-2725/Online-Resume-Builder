@@ -1,5 +1,6 @@
 <?php
-header('Content-Type: application/json');
+// Note: Do not set a global Content-Type header here because this file
+// returns both JSON and binary (PDF) responses depending on the endpoint.
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
@@ -19,12 +20,14 @@ $password = '';
 // Error handling function
 function sendError($message, $code = 400) {
     http_response_code($code);
+    header('Content-Type: application/json');
     echo json_encode(['error' => $message]);
     exit();
 }
 
 // Success response function
 function sendSuccess($data = null, $message = 'Success') {
+    header('Content-Type: application/json');
     echo json_encode([
         'success' => true,
         'message' => $message,

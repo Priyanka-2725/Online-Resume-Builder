@@ -883,21 +883,33 @@ class ResumeBuilder {
             window.URL.revokeObjectURL(url);
         } catch (error) {
             console.error('Download error:', error);
-            // Graceful fallback to client-side printable HTML if server PDF fails
+            // Attempt client-side PDF generation via jsPDF before falling back to print dialog
             try {
-        const printWindow = window.open('', '_blank');
-        const printContent = this.generatePDFHTML();
-        printWindow.document.write(printContent);
-        printWindow.document.close();
-        printWindow.onload = function() {
-            printWindow.focus();
-            printWindow.print();
-        };
-                alert('Server PDF generation failed. Opening print dialog as fallback. You can save as PDF from there.');
-            } catch (e) {
+                this.createPDF();
+                return;
+            } catch (e1) {
+                // If jsPDF path fails synchronously, fall back to print dialog
+            }
+            try {
+                const printWindow = window.open('', '_blank');
+                const printContent = this.generatePDFHTML();
+                printWindow.document.write(printContent);
+                printWindow.document.close();
+                printWindow.onload = function() {
+                    printWindow.focus();
+                    printWindow.print();
+                };
+                alert('Server PDF generation failed. Opened print dialog as fallback. Use "Save as PDF" to download.');
+            } catch (e2) {
                 alert('PDF generation failed: ' + (error.message || 'Unknown error') + '. Please try again or contact support.');
             }
         }
+    }
+
+    // Unified export entrypoint used by completion screen button
+    exportToPDF() {
+        // Prefer server-rendered PDF, then fall back to client-side jsPDF, then print dialog
+        this.downloadPDF();
     }
 
     createPDF() {
