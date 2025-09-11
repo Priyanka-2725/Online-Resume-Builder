@@ -538,12 +538,14 @@ function handleDownload() {
             $start = $edu['startDate'] ?? '';
             $end = $edu['endDate'] ?? '';
             $gpa = $edu['gpa'] ?? '';
+            $percentage = $edu['percentage'] ?? '';
             $header = trim($degree . ($field ? ' in ' . $field : ''));
             if ($inst) { $header .= ' — ' . $inst; }
             $dates = trim(($start ?: '') . ($end ? ' - ' . $end : ''));
             $lines[] = $header ?: 'Education';
             if ($dates) { $lines[] = $dates; }
             if ($gpa) { $lines[] = 'GPA: ' . $gpa; }
+            if ($percentage) { $lines[] = 'Percentage: ' . $percentage; }
             $lines[] = '';
         }
     }
@@ -767,7 +769,9 @@ function buildTemplateHtml($data, $template) {
             $html .= '<div class="entry-title">' . htmlspecialchars(($edu['degree'] ?? 'Degree') . (!empty($edu['field']) ? ' in ' . $edu['field'] : '')) . '</div>';
             $html .= '<div class="entry-date">' . htmlspecialchars(($formatDate($edu['startDate'] ?? '') ?: '') . ' - ' . ($formatDate($edu['endDate'] ?? '') ?: '')) . '</div>';
             $html .= '</div>';
-            $inst = htmlspecialchars(($edu['institution'] ?? '')) . (!empty($edu['gpa']) ? ' • GPA: ' . htmlspecialchars($edu['gpa']) : '');
+            $inst = htmlspecialchars(($edu['institution'] ?? ''))
+                . (!empty($edu['gpa']) ? ' • GPA: ' . htmlspecialchars($edu['gpa']) : '')
+                . (!empty($edu['percentage']) ? ' • ' . htmlspecialchars($edu['percentage']) : '');
             if ($inst) $html .= '<div class="entry-sub">' . $inst . '</div>';
             if (!empty($edu['description'])) $html .= '<div class="entry-desc">' . nl2br(htmlspecialchars($edu['description'])) . '</div>';
             $html .= '</div>';
@@ -1000,6 +1004,7 @@ function buildSimplePdf($lines, $resumeData = null) {
                     $dates = array_filter([$start, $end]);
                     $dateText = implode(' - ', $dates);
                     if ($gpa) $dateText .= ' | GPA: ' . $gpa;
+                    if (!empty($edu['percentage'])) $dateText .= ' | ' . $edu['percentage'];
                     $content .= "1 0 0 1 72 $y Tm\n"; // Left align
                     $content .= "/F2 12 Tf\n"; // Smaller
                     $content .= "(" . pdf_escape_text($dateText) . ") Tj\n";
@@ -1244,6 +1249,7 @@ function buildSimplePdf($lines, $resumeData = null) {
                     $dates = array_filter([$start, $end]);
                     $dateText = implode(' - ', $dates);
                     if ($gpa) $dateText .= ' | GPA: ' . $gpa;
+                    if (!empty($edu['percentage'])) $dateText .= ' | ' . $edu['percentage'];
                     $content .= "1 0 0 1 72 $y Tm\n"; // Left align
                     $content .= "/F2 12 Tf\n"; // Smaller
                     $content .= "(" . pdf_escape_text($dateText) . ") Tj\n";
