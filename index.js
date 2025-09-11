@@ -361,6 +361,7 @@ class ResumeBuilder {
             startDate: '',
             endDate: '',
             gpa: '',
+            percentage: '',
             description: ''
         };
         this.resumeData.education.push(education);
@@ -403,6 +404,10 @@ class ResumeBuilder {
                     <div class="form-group">
                         <label>GPA (Optional)</label>
                         <input type="text" name="education_${index}_gpa" value="${edu.gpa}" placeholder="3.8">
+                    </div>
+                    <div class="form-group">
+                        <label>Percentage (Optional)</label>
+                        <input type="text" name="education_${index}_percentage" value="${edu.percentage}" placeholder="85%">
                     </div>
                 </div>
                 <div class="form-group">
@@ -689,7 +694,7 @@ class ResumeBuilder {
                                     <h3>${edu.degree || 'Degree'} in ${edu.field || 'Field'}</h3>
                                     <span class="date">${formatDate(edu.startDate)} - ${formatDate(edu.endDate)}</span>
                                 </div>
-                                <p class="institution">${edu.institution}${edu.gpa ? ` • GPA: ${edu.gpa}` : ''}</p>
+                                <p class="institution">${edu.institution}${(edu.gpa ? ` • GPA: ${edu.gpa}` : '') + (edu.percentage ? ` • ${edu.percentage}` : '')}</p>
                                 ${edu.description ? `<p class="description">${edu.description}</p>` : ''}
                             </div>
                         `).join('')}
@@ -793,7 +798,7 @@ class ResumeBuilder {
                                     <h3>${edu.degree || 'Degree'} in ${edu.field || 'Field'}</h3>
                                     <span class="date">${formatDate(edu.startDate)} - ${formatDate(edu.endDate)}</span>
                                 </div>
-                                <p class="institution">${edu.institution}${edu.gpa ? ` • GPA: ${edu.gpa}` : ''}</p>
+                                <p class="institution">${edu.institution}${(edu.gpa ? ` • GPA: ${edu.gpa}` : '') + (edu.percentage ? ` • ${edu.percentage}` : '')}</p>
                                 ${edu.description ? `<p class="description">${edu.description}</p>` : ''}
                             </div>
                         `).join('')}
@@ -1034,7 +1039,7 @@ class ResumeBuilder {
                     
                     doc.setFontSize(10);
                     doc.setFont('helvetica', 'normal');
-                    const institutionText = `${edu.institution}${edu.gpa ? ` • GPA: ${edu.gpa}` : ''}`;
+                    const institutionText = `${edu.institution}${(edu.gpa ? ` • GPA: ${edu.gpa}` : '') + (edu.percentage ? ` • ${edu.percentage}` : '')}`;
                     doc.text(institutionText, margin, y);
                     y += 5;
                     
@@ -1249,7 +1254,7 @@ class ResumeBuilder {
                                         <div class="entry-title">${edu.degree || 'Degree'} in ${edu.field || 'Field'}</div>
                                         <div class="entry-date">${formatDate(edu.startDate)} - ${formatDate(edu.endDate)}</div>
                                     </div>
-                                    <div class="entry-subtitle">${edu.institution}${edu.gpa ? ` • GPA: ${edu.gpa}` : ''}</div>
+                                    <div class="entry-subtitle">${edu.institution}${(edu.gpa ? ` • GPA: ${edu.gpa}` : '') + (edu.percentage ? ` • ${edu.percentage}` : '')}</div>
                                     ${edu.description ? `<div class="entry-description">${edu.description}</div>` : ''}
                                 </div>
                             `).join('')}
@@ -1974,7 +1979,7 @@ async function printResume(resumeId) {
                                                     <div class="entry-title">${edu.degree || 'Degree'} in ${edu.field || 'Field'}</div>
                                                     <div class="entry-date">${formatDate(edu.startDate)} - ${formatDate(edu.endDate)}</div>
                                                 </div>
-                                                <div class="entry-subtitle">${edu.institution}${edu.gpa ? ` • GPA: ${edu.gpa}` : ''}</div>
+                                                <div class="entry-subtitle">${edu.institution}${(edu.gpa ? ` • GPA: ${edu.gpa}` : '') + (edu.percentage ? ` • ${edu.percentage}` : '')}</div>
                                                 ${edu.description ? `<div class="entry-description">${edu.description}</div>` : ''}
                                             </div>
                                         `).join('')}
